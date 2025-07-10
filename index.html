@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Your SyncToken</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f5f5f5;
+      color: #333;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+    }
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .price-display {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 30px;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    .image-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .image-option {
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 5px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+    }
+    .image-option.selected {
+      border-color: #111;
+    }
+    .image-option img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>Order Your SyncToken</h1>
+    <form id="orderForm">
+      <label for="tokenType">Choose Token Type:</label>
+      <select id="tokenType" name="tokenType">
+        <option value="premade">Premade</option>
+        <option value="custom">Custom</option>
+      </select>
+
+      <div id="premadeOptions">
+        <label>Select a Premade Design:</label>
+        <div class="image-options">
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=House" alt="House"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Wine" alt="Wine Glass"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Heel" alt="High Heel"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Car" alt="Car"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Star" alt="Star"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Crown" alt="Crown"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Hammer" alt="Hammer"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Mic" alt="Microphone"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Book" alt="Book"></div>
+          <div class="image-option"><img src="https://via.placeholder.com/100?text=Leaf" alt="Leaf"></div>
+        </div>
+      </div>
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" value="1" min="1">
+
+      <label for="customText">Instagram Handle or Custom Name:</label>
+      <input type="text" id="customText" name="customText" placeholder="@username">
+
+      <div class="price-display" id="priceDisplay">Total Price: $10</div>
+
+      <button type="submit">Place Order</button>
+    </form>
+  </div>
+
+  <div class="form-container" style="margin-top: 40px;">
+    <h2>Customize Your Wine Glass Token</h2>
+    <div>
+      <label>Bottom Layer Color: <input type="color" id="colorBottom" value="#c0c0c0"></label>
+      <label>Middle Layer Color: <input type="color" id="colorMiddle" value="#a0a0a0"></label>
+      <label>Top Layer Color: <input type="color" id="colorTop" value="#808080"></label>
+    </div>
+    <div id="viewer" style="width: 100%; height: 400px; margin-top: 20px;"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 600 / 400, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(600, 400);
+    document.getElementById('viewer').appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.set(0, 0, 100);
+    controls.update();
+
+    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    scene.add(light);
+
+    const loader = new THREE.STLLoader();
+    let meshTop, meshMiddle, meshBottom;
+
+    const materials = {
+      top: new THREE.MeshStandardMaterial({ color: 0x808080 }),
+      middle: new THREE.MeshStandardMaterial({ color: 0xa0a0a0 }),
+      bottom: new THREE.MeshStandardMaterial({ color: 0xc0c0c0 })
+    };
+
+    function loadSTL(url, material, yOffset = 0, callback) {
+      loader.load(url, geometry => {
+        geometry.center();
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.y = yOffset;
+        scene.add(mesh);
+        callback(mesh);
+      });
+    }
+
+    loadSTL('https://www.dropbox.com/scl/fi/jmzbi5883dzpck4jxm189/wine-bottom.stl?rlkey=y6l3w7zyywd3zqz9kvpobu6ic&st=d2mtjf1z&dl=1', materials.bottom, -2, m => meshBottom = m);
+    loadSTL('https://www.dropbox.com/scl/fi/xr2tbhmahwxipy23lr6le/wine-middle.stl?rlkey=jn64ej9q9pbnh0chhw4nqyeke&st=yeq09jul&dl=1', materials.middle, 0, m => meshMiddle = m);
+    loadSTL('https://www.dropbox.com/scl/fi/46z8bfcb1fo66mipghym9/wine-top.stl?rlkey=v178qgeu6cwffpfmeic5iidpg&st=62kgvwt4&dl=1', materials.top, 2, m => meshTop = m);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    document.getElementById('colorBottom').addEventListener('input', e => {
+      materials.bottom.color.set(e.target.value);
+    });
+    document.getElementById('colorMiddle').addEventListener('input', e => {
+      materials.middle.color.set(e.target.value);
+    });
+    document.getElementById('colorTop').addEventListener('input', e => {
+      materials.top.color.set(e.target.value);
+    });
+  </script>
+</body>
+</html>
