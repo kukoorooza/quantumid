@@ -72,6 +72,11 @@
       display: block;
       border-radius: 6px;
     }
+    #viewer {
+      width: 100%;
+      height: 400px;
+      position: relative;
+    }
   </style>
 </head>
 <body>
@@ -119,7 +124,7 @@
       <label>Middle Layer Color: <input type="color" id="colorMiddle" value="#a0a0a0"></label>
       <label>Top Layer Color: <input type="color" id="colorTop" value="#808080"></label>
     </div>
-    <div id="viewer" style="width: 100%; height: 400px; margin-top: 20px;"></div>
+    <div id="viewer"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
@@ -127,60 +132,23 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const tokenTypeEl = document.getElementById('tokenType');
-      const quantityEl = document.getElementById('quantity');
-      const priceDisplay = document.getElementById('priceDisplay');
-      const premadeOptionsEl = document.getElementById('premadeOptions');
-
-      function calculatePrice() {
-        const type = tokenTypeEl.value;
-        const quantity = parseInt(quantityEl.value, 10);
-        let unitPrice;
-        if (type === 'premade') {
-          if (quantity >= 100) unitPrice = 5;
-          else if (quantity >= 50) unitPrice = 7;
-          else if (quantity >= 10) unitPrice = 8;
-          else unitPrice = 10;
-        } else {
-          if (quantity >= 100) unitPrice = 4;
-          else if (quantity >= 50) unitPrice = 6;
-          else if (quantity >= 10) unitPrice = 7;
-          else unitPrice = 9;
-        }
-        priceDisplay.textContent = `Total Price: $${unitPrice * quantity}`;
-      }
-
-      tokenTypeEl.addEventListener('change', () => {
-        premadeOptionsEl.style.display = tokenTypeEl.value === 'premade' ? 'block' : 'none';
-        calculatePrice();
-      });
-
-      quantityEl.addEventListener('input', calculatePrice);
-      calculatePrice();
-
-      document.querySelectorAll('.image-option').forEach(option => {
-        option.addEventListener('click', () => {
-          document.querySelectorAll('.image-option').forEach(o => o.classList.remove('selected'));
-          option.classList.add('selected');
-        });
-      });
-
-      document.getElementById('orderForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Order placed!');
-      });
+      const viewer = document.getElementById('viewer');
+      const width = viewer.clientWidth;
+      const height = viewer.clientHeight;
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, 600 / 400, 0.1, 1000);
+      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 60);
+
       const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(600, 400);
-      document.getElementById('viewer').appendChild(renderer.domElement);
+      renderer.setSize(width, height);
+      viewer.appendChild(renderer.domElement);
 
       const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      camera.position.set(0, 0, 100);
-      controls.update();
 
-      const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+      const light = new THREE.DirectionalLight(0xffffff, 0.6);
+      light.position.set(50, 50, 50);
       scene.add(light);
 
       const loader = new THREE.STLLoader();
@@ -196,19 +164,12 @@
           const mesh = new THREE.Mesh(geometry, material);
           mesh.position.y = yOffset;
           scene.add(mesh);
-        }, undefined, err => console.error('STL load error', err));
+        });
       }
 
-      loadSTL('wine-bottom.stl', materials.bottom, -2);
-      loadSTL('wine-middle.stl', materials.middle, 0);
-      loadSTL('wine-top.stl', materials.top, 2);
-
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      }
-      animate();
+      loadSTL("wine-bottom.stl", materials.bottom, -1.5);
+      loadSTL("wine-middle.stl", materials.middle, 0);
+      loadSTL("wine-top.stl", materials.top, 1.5);
 
       document.getElementById('colorBottom').addEventListener('input', e => {
         materials.bottom.color.set(e.target.value);
@@ -219,6 +180,13 @@
       document.getElementById('colorTop').addEventListener('input', e => {
         materials.top.color.set(e.target.value);
       });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
     });
   </script>
 </body>
