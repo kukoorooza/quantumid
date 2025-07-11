@@ -34,9 +34,6 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    input[type="checkbox"] {
-      margin-right: 10px;
-    }
     .price-display {
       font-weight: bold;
       margin-top: 20px;
@@ -51,9 +48,6 @@
       font-size: 16px;
       border-radius: 5px;
       cursor: pointer;
-    }
-    .hidden {
-      display: none;
     }
     .image-options {
       display: grid;
@@ -118,7 +112,6 @@
     </form>
   </div>
 
-  <!-- 3D Viewer Section -->
   <div class="form-container" style="margin-top: 40px;">
     <h2>Customize Your Wine Glass Token</h2>
     <div>
@@ -133,7 +126,37 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
   <script>
-    // Highlight selection
+    const tokenTypeEl = document.getElementById('tokenType');
+    const quantityEl = document.getElementById('quantity');
+    const priceDisplay = document.getElementById('priceDisplay');
+    const premadeOptionsEl = document.getElementById('premadeOptions');
+
+    function calculatePrice() {
+      const type = tokenTypeEl.value;
+      const quantity = parseInt(quantityEl.value, 10);
+      let unitPrice;
+      if (type === 'premade') {
+        if (quantity >= 100) unitPrice = 5;
+        else if (quantity >= 50) unitPrice = 7;
+        else if (quantity >= 10) unitPrice = 8;
+        else unitPrice = 10;
+      } else {
+        if (quantity >= 100) unitPrice = 4;
+        else if (quantity >= 50) unitPrice = 6;
+        else if (quantity >= 10) unitPrice = 7;
+        else unitPrice = 9;
+      }
+      priceDisplay.textContent = `Total Price: $${unitPrice * quantity}`;
+    }
+
+    tokenTypeEl.addEventListener('change', () => {
+      premadeOptionsEl.style.display = tokenTypeEl.value === 'premade' ? 'block' : 'none';
+      calculatePrice();
+    });
+
+    quantityEl.addEventListener('input', calculatePrice);
+    document.addEventListener('DOMContentLoaded', calculatePrice);
+
     document.querySelectorAll('.image-option').forEach(option => {
       option.addEventListener('click', () => {
         document.querySelectorAll('.image-option').forEach(o => o.classList.remove('selected'));
@@ -141,7 +164,6 @@
       });
     });
 
-    // 3D rendering
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 600 / 400, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -156,27 +178,24 @@
     scene.add(light);
 
     const loader = new THREE.STLLoader();
-    let meshTop, meshMiddle, meshBottom;
-
     const materials = {
       top: new THREE.MeshStandardMaterial({ color: 0x808080 }),
       middle: new THREE.MeshStandardMaterial({ color: 0xa0a0a0 }),
       bottom: new THREE.MeshStandardMaterial({ color: 0xc0c0c0 })
     };
 
-    function loadSTL(url, material, yOffset = 0, callback) {
+    function loadSTL(url, material, yOffset = 0) {
       loader.load(url, geometry => {
         geometry.center();
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.y = yOffset;
         scene.add(mesh);
-        callback(mesh);
       });
     }
 
-    loadSTL('https://www.dropbox.com/scl/fi/jmzbi5883dzpck4jxm189/wine-bottom.stl?rlkey=y6l3w7zyywd3zqz9kvpobu6ic&st=d2mtjf1z&dl=1', materials.bottom, -2, m => meshBottom = m);
-    loadSTL('https://www.dropbox.com/scl/fi/xr2tbhmahwxipy23lr6le/wine-middle.stl?rlkey=jn64ej9q9pbnh0chhw4nqyeke&st=yeq09jul&dl=1', materials.middle, 0, m => meshMiddle = m);
-    loadSTL('https://www.dropbox.com/scl/fi/46z8bfcb1fo66mipghym9/wine-top.stl?rlkey=v178qgeu6cwffpfmeic5iidpg&st=62kgvwt4&dl=1', materials.top, 2, m => meshTop = m);
+    loadSTL('https://www.dropbox.com/scl/fi/jmzbi5883dzpck4jxm189/wine-bottom.stl?rlkey=y6l3w7zyywd3zqz9kvpobu6ic&st=d2mtjf1z&dl=1', materials.bottom, -2);
+    loadSTL('https://www.dropbox.com/scl/fi/xr2tbhmahwxipy23lr6le/wine-middle.stl?rlkey=jn64ej9q9pbnh0chhw4nqyeke&st=yeq09jul&dl=1', materials.middle, 0);
+    loadSTL('https://www.dropbox.com/scl/fi/46z8bfcb1fo66mipghym9/wine-top.stl?rlkey=v178qgeu6cwffpfmeic5iidpg&st=62kgvwt4&dl=1', materials.top, 2);
 
     function animate() {
       requestAnimationFrame(animate);
