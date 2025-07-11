@@ -3,174 +3,652 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Your SyncToken</title>
+  <title>SyncToken - Premium NFC Tokens</title>
   <style>
-    body {
-      font-family: sans-serif;
+    * {
       margin: 0;
-      padding: 40px;
-      background: #f5f5f5;
-      color: #333;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .form-container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      line-height: 1.5;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 20px 0;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 21px;
+      color: #86868b;
+    }
+
+    .selection-section {
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 18px;
+      padding: 40px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
     }
-    h1, h2 {
+
+    .token-type-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .type-option {
+      border: 2px solid #d2d2d7;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
       text-align: center;
     }
-    label {
-      display: block;
-      margin-top: 20px;
+
+    .type-option:hover {
+      border-color: #0071e3;
+      transform: scale(1.02);
     }
-    input[type="text"], input[type="number"], textarea, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+
+    .type-option.selected {
+      border-color: #0071e3;
+      background: #f0f8ff;
     }
-    .price-display {
-      font-weight: bold;
-      margin-top: 20px;
+
+    .type-option h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
     }
-    button {
-      margin-top: 30px;
-      padding: 12px;
-      width: 100%;
-      border: none;
-      background: #111;
-      color: white;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
+
+    .type-option p {
+      color: #86868b;
+      font-size: 14px;
     }
-    .image-options {
+
+    .design-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
     }
-    .image-option {
-      border: 2px solid transparent;
-      border-radius: 8px;
-      padding: 5px;
+
+    .design-option {
+      border: 2px solid #d2d2d7;
+      border-radius: 12px;
+      padding: 16px;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
+      transition: all 0.3s ease;
+      text-align: center;
+      background: #fafafa;
     }
-    .image-option.selected {
-      border-color: #111;
+
+    .design-option:hover {
+      border-color: #0071e3;
+      transform: translateY(-2px);
     }
-    .image-option img {
-      max-width: 100%;
-      height: auto;
+
+    .design-option.selected {
+      border-color: #0071e3;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0, 113, 227, 0.15);
+    }
+
+    .design-option img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 32px;
+    }
+
+    .form-group label {
       display: block;
-      border-radius: 6px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="url"],
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #d2d2d7;
+      border-radius: 10px;
+      font-size: 17px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #0071e3;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid #d2d2d7;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-group:hover {
+      border-color: #0071e3;
+    }
+
+    .checkbox-group.checked {
+      background: #f0f8ff;
+      border-color: #0071e3;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+    }
+
+    .file-upload {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .file-upload-label {
+      display: block;
+      padding: 16px;
+      border: 2px dashed #d2d2d7;
+      border-radius: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload:hover .file-upload-label {
+      border-color: #0071e3;
+      background: #f0f8ff;
+    }
+
+    .customizer-section {
+      background: white;
+      border-radius: 18px;
+      padding: 40px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .color-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .color-control {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border: 1px solid #d2d2d7;
+      border-radius: 10px;
+    }
+
+    .color-control input[type="color"] {
+      width: 50px;
+      height: 50px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
     #viewer {
       width: 100%;
       height: 400px;
-      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f5f5f7;
+    }
+
+    .price-summary {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 17px;
+    }
+
+    .price-row.total {
+      font-size: 24px;
+      font-weight: 600;
+      padding-top: 12px;
+      border-top: 1px solid #d2d2d7;
+    }
+
+    .order-button {
+      width: 100%;
+      padding: 18px 32px;
+      background: #0071e3;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .order-button:hover {
+      background: #0051d5;
+      transform: translateY(-1px);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
-    <h1>Order Your SyncToken</h1>
-    <form id="orderForm">
-      <label for="tokenType">Choose Token Type:</label>
-      <select id="tokenType" name="tokenType">
-        <option value="premade">Premade</option>
-        <option value="custom">Custom</option>
-      </select>
-
-      <div id="premadeOptions">
-        <label>Select a Premade Design:</label>
-        <div class="image-options" id="designOptions">
-          <div class="image-option" data-value="House"><img src="https://via.placeholder.com/100?text=House" alt="House"></div>
-          <div class="image-option" data-value="Wine"><img src="https://via.placeholder.com/100?text=Wine" alt="Wine Glass"></div>
-          <div class="image-option" data-value="Heel"><img src="https://via.placeholder.com/100?text=Heel" alt="High Heel"></div>
-          <div class="image-option" data-value="Car"><img src="https://via.placeholder.com/100?text=Car" alt="Car"></div>
-          <div class="image-option" data-value="Star"><img src="https://via.placeholder.com/100?text=Star" alt="Star"></div>
-          <div class="image-option" data-value="Crown"><img src="https://via.placeholder.com/100?text=Crown" alt="Crown"></div>
-          <div class="image-option" data-value="Hammer"><img src="https://via.placeholder.com/100?text=Hammer" alt="Hammer"></div>
-          <div class="image-option" data-value="Mic"><img src="https://via.placeholder.com/100?text=Mic" alt="Microphone"></div>
-          <div class="image-option" data-value="Book"><img src="https://via.placeholder.com/100?text=Book" alt="Book"></div>
-          <div class="image-option" data-value="Leaf"><img src="https://via.placeholder.com/100?text=Leaf" alt="Leaf"></div>
-        </div>
-      </div>
-
-      <label for="quantity">Quantity:</label>
-      <input type="number" id="quantity" name="quantity" value="1" min="1">
-
-      <label for="customText">Instagram Handle or Custom Name:</label>
-      <input type="text" id="customText" name="customText" placeholder="@username">
-
-      <div class="price-display" id="priceDisplay">Total Price: $10</div>
-
-      <button type="submit">Place Order</button>
-    </form>
-  </div>
-
-  <div class="form-container" style="margin-top: 40px;">
-    <h2>Customize Your Wine Glass Token</h2>
-    <div>
-      <label>Bottom Layer Color: <input type="color" id="colorBottom" value="#c0c0c0"></label>
-      <label>Middle Layer Color: <input type="color" id="colorMiddle" value="#a0a0a0"></label>
-      <label>Top Layer Color: <input type="color" id="colorTop" value="#808080"></label>
+  <header class="header">
+    <div class="container">
+      <h2 style="font-size: 24px; font-weight: 600;">SyncToken</h2>
     </div>
-    <div id="viewer"></div>
-  </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="container">
+        <h1>Order Your SyncToken</h1>
+        <p>Premium NFC-enabled tokens, crafted to perfection</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <form id="orderForm">
+        <div class="selection-section">
+          <h2 class="section-title">Choose Your Token Type</h2>
+          
+          <div class="token-type-selector">
+            <div class="type-option" data-type="premade">
+              <h3>Premade Designs</h3>
+              <p>Choose from our curated collection</p>
+              <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">Starting at $10</p>
+            </div>
+            <div class="type-option" data-type="custom">
+              <h3>Custom Design</h3>
+              <p>Create your unique token</p>
+              <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">$500 base + unit price</p>
+            </div>
+          </div>
+
+          <div id="premadeSection" class="hidden">
+            <h3 style="margin-bottom: 24px;">Select a Design</h3>
+            <div class="design-grid">
+              <div class="design-option" data-design="wine">
+                <img src="https://via.placeholder.com/80?text=Wine" alt="Wine Glass">
+                <div>Wine Glass</div>
+              </div>
+              <div class="design-option" data-design="heel">
+                <img src="https://via.placeholder.com/80?text=Heel" alt="High Heel">
+                <div>High Heel</div>
+              </div>
+              <div class="design-option" data-design="tire">
+                <img src="https://via.placeholder.com/80?text=Tire" alt="Tire">
+                <div>Tire</div>
+              </div>
+              <div class="design-option" data-design="star">
+                <img src="https://via.placeholder.com/80?text=Star" alt="Star">
+                <div>Star</div>
+              </div>
+              <div class="design-option" data-design="crown">
+                <img src="https://via.placeholder.com/80?text=Crown" alt="Crown">
+                <div>Crown</div>
+              </div>
+              <div class="design-option" data-design="hammer">
+                <img src="https://via.placeholder.com/80?text=Hammer" alt="Hammer">
+                <div>Hammer</div>
+              </div>
+              <div class="design-option" data-design="mic">
+                <img src="https://via.placeholder.com/80?text=Mic" alt="Microphone">
+                <div>Microphone</div>
+              </div>
+              <div class="design-option" data-design="book">
+                <img src="https://via.placeholder.com/80?text=Book" alt="Book">
+                <div>Book</div>
+              </div>
+              <div class="design-option" data-design="leaf">
+                <img src="https://via.placeholder.com/80?text=Leaf" alt="Leaf">
+                <div>Leaf</div>
+              </div>
+              <div class="design-option" data-design="house">
+                <img src="https://via.placeholder.com/80?text=House" alt="House">
+                <div>House</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="checkbox-group" id="customTextOption">
+                <input type="checkbox" id="addCustomText" name="addCustomText">
+                <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
+              </div>
+              <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden" style="margin-top: 16px;">
+            </div>
+          </div>
+
+          <div id="customSection" class="hidden">
+            <div class="form-group">
+              <label>Describe Your Custom Design</label>
+              <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Upload Reference Image (Optional)</label>
+              <div class="file-upload">
+                <input type="file" id="customFile" name="customFile" accept="image/*">
+                <label for="customFile" class="file-upload-label">
+                  <span>Click to upload or drag and drop</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1">
+          </div>
+
+          <div class="form-group">
+            <label>NFC Link URL</label>
+            <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
+          </div>
+
+          <div class="price-summary">
+            <div class="price-row" id="basePrice" style="display: none;">
+              <span>Base Fee</span>
+              <span>$500</span>
+            </div>
+            <div class="price-row" id="unitPrice">
+              <span>Unit Price</span>
+              <span>$10</span>
+            </div>
+            <div class="price-row" id="quantityRow">
+              <span>Quantity</span>
+              <span>1</span>
+            </div>
+            <div class="price-row" id="customTextPrice" style="display: none;">
+              <span>Custom Text</span>
+              <span>$50</span>
+            </div>
+            <div class="price-row total">
+              <span>Total</span>
+              <span id="totalPrice">$10</span>
+            </div>
+          </div>
+
+          <button type="submit" class="order-button">Place Order</button>
+        </div>
+      </form>
+
+      <div class="customizer-section hidden" id="customizerSection">
+        <h2 class="section-title">Customize Your Token</h2>
+        
+        <div class="color-controls">
+          <div class="color-control">
+            <label>Bottom Layer</label>
+            <input type="color" id="colorBottom" value="#c0c0c0">
+          </div>
+          <div class="color-control">
+            <label>Middle Layer</label>
+            <input type="color" id="colorMiddle" value="#a0a0a0">
+          </div>
+          <div class="color-control">
+            <label>Top Layer</label>
+            <input type="color" id="colorTop" value="#808080">
+          </div>
+        </div>
+
+        <div id="viewer"></div>
+      </div>
+    </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
   <script>
-    window.onload = () => {
-      const viewer = document.getElementById('viewer');
-      const width = viewer.offsetWidth || 600;
-      const height = viewer.offsetHeight || 400;
+    // Pricing structure
+    const pricing = {
+      premade: [
+        { max: 9, price: 10 },
+        { max: 49, price: 8 },
+        { max: 99, price: 7 },
+        { max: Infinity, price: 5 }
+      ],
+      custom: [
+        { max: 9, price: 9 },
+        { max: 49, price: 7 },
+        { max: 99, price: 6 },
+        { max: Infinity, price: 4 }
+      ]
+    };
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    // State
+    let state = {
+      type: null,
+      design: null,
+      quantity: 1,
+      customText: false,
+      baseFee: 0
+    };
+
+    // DOM elements
+    const typeOptions = document.querySelectorAll('.type-option');
+    const premadeSection = document.getElementById('premadeSection');
+    const customSection = document.getElementById('customSection');
+    const customizerSection = document.getElementById('customizerSection');
+    const designOptions = document.querySelectorAll('.design-option');
+    const quantityInput = document.getElementById('quantity');
+    const customTextCheckbox = document.getElementById('addCustomText');
+    const customTextInput = document.getElementById('customText');
+    const customTextOption = document.getElementById('customTextOption');
+    const fileInput = document.getElementById('customFile');
+    const fileLabel = document.querySelector('.file-upload-label span');
+
+    // Event listeners
+    typeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        typeOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        
+        state.type = option.dataset.type;
+        state.baseFee = state.type === 'custom' ? 500 : 0;
+        
+        if (state.type === 'premade') {
+          premadeSection.classList.remove('hidden');
+          customSection.classList.add('hidden');
+        } else {
+          premadeSection.classList.add('hidden');
+          customSection.classList.remove('hidden');
+          customizerSection.classList.add('hidden');
+        }
+        
+        updatePrice();
+      });
+    });
+
+    designOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        designOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        state.design = option.dataset.design;
+        
+        // Show customizer for selected design
+        customizerSection.classList.remove('hidden');
+        initThreeJS();
+      });
+    });
+
+    quantityInput.addEventListener('input', (e) => {
+      state.quantity = parseInt(e.target.value) || 1;
+      updatePrice();
+    });
+
+    customTextOption.addEventListener('click', () => {
+      state.customText = !state.customText;
+      customTextCheckbox.checked = state.customText;
+      customTextOption.classList.toggle('checked', state.customText);
+      customTextInput.classList.toggle('hidden', !state.customText);
+      updatePrice();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        fileLabel.textContent = e.target.files[0].name;
+      }
+    });
+
+    function getUnitPrice() {
+      if (!state.type) return 0;
+      
+      const priceList = pricing[state.type];
+      for (let tier of priceList) {
+        if (state.quantity <= tier.max) {
+          return tier.price;
+        }
+      }
+    }
+
+    function updatePrice() {
+      const unitPrice = getUnitPrice();
+      const customTextFee = state.customText ? 50 : 0;
+      const total = state.baseFee + (unitPrice * state.quantity) + customTextFee;
+      
+      // Update price display
+      document.getElementById('basePrice').style.display = state.baseFee > 0 ? 'flex' : 'none';
+      document.getElementById('unitPrice').querySelector('span:last-child').textContent = `$${unitPrice}`;
+      document.getElementById('quantityRow').querySelector('span:last-child').textContent = state.quantity;
+      document.getElementById('customTextPrice').style.display = state.customText ? 'flex' : 'none';
+      document.getElementById('totalPrice').textContent = `$${total}`;
+    }
+
+    // Three.js setup
+    let scene, camera, renderer, controls;
+    let materials = {};
+
+    function initThreeJS() {
+      if (renderer) return; // Already initialized
+      
+      const viewer = document.getElementById('viewer');
+      const width = viewer.offsetWidth;
+      const height = viewer.offsetHeight;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf5f5f7);
+      
+      camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
       camera.position.set(0, 0, 60);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(width, height);
       viewer.appendChild(renderer.domElement);
 
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
 
+      // Lighting
       scene.add(new THREE.AmbientLight(0xffffff, 0.8));
       const light = new THREE.DirectionalLight(0xffffff, 0.6);
       light.position.set(50, 50, 50);
       scene.add(light);
 
-      const loader = new THREE.STLLoader();
-      const materials = {
+      // Materials
+      materials = {
         top: new THREE.MeshStandardMaterial({ color: 0x808080 }),
         middle: new THREE.MeshStandardMaterial({ color: 0xa0a0a0 }),
         bottom: new THREE.MeshStandardMaterial({ color: 0xc0c0c0 })
       };
 
+      // Load STL files based on selected design
+      const loader = new THREE.STLLoader();
+      
       function loadSTL(path, material, yOffset = 0) {
         loader.load(path, geometry => {
           geometry.center();
           const mesh = new THREE.Mesh(geometry, material);
           mesh.position.y = yOffset;
           scene.add(mesh);
+        }, undefined, (error) => {
+          console.log('STL loading error, using placeholder geometry');
+          // Placeholder geometry if STL fails
+          const geometry = new THREE.BoxGeometry(20, 5, 20);
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.position.y = yOffset;
+          scene.add(mesh);
         });
       }
 
-      loadSTL("/wine-bottom.stl", materials.bottom, -1.5);
-      loadSTL("/wine-middle.stl", materials.middle, 0);
-      loadSTL("/wine-top.stl", materials.top, 1.5);
+      // Load appropriate model based on selection
+      const design = state.design || 'wine';
+      loadSTL(`/${design}-bottom.stl`, materials.bottom, -10);
+      loadSTL(`/${design}-middle.stl`, materials.middle, 0);
+      loadSTL(`/${design}-top.stl`, materials.top, 10);
 
+      // Color controls
       document.getElementById('colorBottom').addEventListener('input', e => {
         materials.bottom.color.set(e.target.value);
       });
@@ -181,13 +659,32 @@
         materials.top.color.set(e.target.value);
       });
 
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      }
       animate();
     }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Form submission
+    document.getElementById('orderForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Collect form data
+      const formData = {
+        type: state.type,
+        design: state.design,
+        quantity: state.quantity,
+        customText: state.customText ? customTextInput.value : null,
+        nfcUrl: document.getElementById('nfcUrl').value,
+        totalPrice: document.getElementById('totalPrice').textContent
+      };
+      
+      console.log('Order submitted:', formData);
+      alert('Order form is ready! Form data logged to console.');
+    });
   </script>
 </body>
 </html>
