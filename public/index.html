@@ -27,7 +27,7 @@
       display: block;
       margin-top: 20px;
     }
-    input[type="text"], input[type="number"], textarea {
+    input[type="text"], input[type="number"], textarea, select {
       width: 100%;
       padding: 10px;
       margin-top: 8px;
@@ -133,6 +133,48 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const viewer = document.getElementById('viewer');
+      const tokenTypeEl = document.getElementById('tokenType');
+      const quantityEl = document.getElementById('quantity');
+      const priceDisplay = document.getElementById('priceDisplay');
+      const premadeOptionsEl = document.getElementById('premadeOptions');
+
+      function calculatePrice() {
+        const type = tokenTypeEl.value;
+        const quantity = parseInt(quantityEl.value, 10);
+        let unitPrice;
+        if (type === 'premade') {
+          if (quantity >= 100) unitPrice = 5;
+          else if (quantity >= 50) unitPrice = 7;
+          else if (quantity >= 10) unitPrice = 8;
+          else unitPrice = 10;
+        } else {
+          if (quantity >= 100) unitPrice = 4;
+          else if (quantity >= 50) unitPrice = 6;
+          else if (quantity >= 10) unitPrice = 7;
+          else unitPrice = 9;
+        }
+        priceDisplay.textContent = `Total Price: $${unitPrice * quantity}`;
+      }
+
+      tokenTypeEl.addEventListener('change', () => {
+        premadeOptionsEl.style.display = tokenTypeEl.value === 'premade' ? 'block' : 'none';
+        calculatePrice();
+      });
+      quantityEl.addEventListener('input', calculatePrice);
+      calculatePrice();
+
+      document.querySelectorAll('.image-option').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('.image-option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+        });
+      });
+
+      document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Order placed!');
+      });
+
       const width = viewer.clientWidth;
       const height = viewer.clientHeight;
 
@@ -167,9 +209,9 @@
         });
       }
 
-      loadSTL("wine-bottom.stl", materials.bottom, -1.5);
-      loadSTL("wine-middle.stl", materials.middle, 0);
-      loadSTL("wine-top.stl", materials.top, 1.5);
+      loadSTL("/wine-bottom.stl", materials.bottom, -1.5);
+      loadSTL("/wine-middle.stl", materials.middle, 0);
+      loadSTL("/wine-top.stl", materials.top, 1.5);
 
       document.getElementById('colorBottom').addEventListener('input', e => {
         materials.bottom.color.set(e.target.value);
