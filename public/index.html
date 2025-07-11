@@ -213,11 +213,10 @@
     }
 
     .customizer-section {
-      background: white;
-      border-radius: 18px;
-      padding: 40px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
     }
 
     .color-controls {
@@ -416,6 +415,27 @@
             <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
           </div>
 
+          <div class="customizer-section hidden" id="customizerSection">
+            <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
+            
+            <div id="viewer"></div>
+            
+            <div class="color-controls">
+              <div class="color-control">
+                <label>Bottom Layer</label>
+                <input type="color" id="colorBottom" value="#c0c0c0">
+              </div>
+              <div class="color-control">
+                <label>Middle Layer</label>
+                <input type="color" id="colorMiddle" value="#a0a0a0">
+              </div>
+              <div class="color-control">
+                <label>Top Layer</label>
+                <input type="color" id="colorTop" value="#808080">
+              </div>
+            </div>
+          </div>
+
           <div class="price-summary">
             <div class="price-row" id="basePrice" style="display: none;">
               <span>Base Fee</span>
@@ -443,26 +463,7 @@
         </div>
       </form>
 
-      <div class="customizer-section hidden" id="customizerSection">
-        <h2 class="section-title">Customize Your Token</h2>
-        
-        <div class="color-controls">
-          <div class="color-control">
-            <label>Bottom Layer</label>
-            <input type="color" id="colorBottom" value="#c0c0c0">
-          </div>
-          <div class="color-control">
-            <label>Middle Layer</label>
-            <input type="color" id="colorMiddle" value="#a0a0a0">
-          </div>
-          <div class="color-control">
-            <label>Top Layer</label>
-            <input type="color" id="colorTop" value="#808080">
-          </div>
-        </div>
 
-        <div id="viewer"></div>
-      </div>
     </div>
   </main>
 
@@ -538,7 +539,8 @@
         
         // Show customizer for selected design
         customizerSection.classList.remove('hidden');
-        initThreeJS();
+        // Small delay to ensure DOM is ready
+        setTimeout(() => initThreeJS(), 100);
       });
     });
 
@@ -588,9 +590,16 @@
     // Three.js setup
     let scene, camera, renderer, controls;
     let materials = {};
+    let meshes = [];
 
     function initThreeJS() {
-      if (renderer) return; // Already initialized
+      // Clear previous scene if it exists
+      if (renderer) {
+        meshes.forEach(mesh => scene.remove(mesh));
+        meshes = [];
+        renderer.dispose();
+        document.getElementById('viewer').innerHTML = '';
+      }
       
       const viewer = document.getElementById('viewer');
       const width = viewer.offsetWidth;
@@ -599,54 +608,49 @@
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0xf5f5f7);
       
-      camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-      camera.position.set(0, 0, 60);
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(30, 30, 50);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(width, height);
+      renderer.shadowMap.enabled = true;
       viewer.appendChild(renderer.domElement);
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
+      controls.minDistance = 20;
+      controls.maxDistance = 100;
 
       // Lighting
-      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-      const light = new THREE.DirectionalLight(0xffffff, 0.6);
-      light.position.set(50, 50, 50);
-      scene.add(light);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(50, 50, 50);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
 
       // Materials
       materials = {
-        top: new THREE.MeshStandardMaterial({ color: 0x808080 }),
-        middle: new THREE.MeshStandardMaterial({ color: 0xa0a0a0 }),
-        bottom: new THREE.MeshStandardMaterial({ color: 0xc0c0c0 })
+        top: new THREE.MeshStandardMaterial({ 
+          color: 0x808080,
+          metalness: 0.3,
+          roughness: 0.4
+        }),
+        middle: new THREE.MeshStandardMaterial({ 
+          color: 0xa0a0a0,
+          metalness: 0.3,
+          roughness: 0.4
+        }),
+        bottom: new THREE.MeshStandardMaterial({ 
+          color: 0xc0c0c0,
+          metalness: 0.3,
+          roughness: 0.4
+        })
       };
 
-      // Load STL files based on selected design
-      const loader = new THREE.STLLoader();
-      
-      function loadSTL(path, material, yOffset = 0) {
-        loader.load(path, geometry => {
-          geometry.center();
-          const mesh = new THREE.Mesh(geometry, material);
-          mesh.position.y = yOffset;
-          scene.add(mesh);
-        }, undefined, (error) => {
-          console.log('STL loading error, using placeholder geometry');
-          // Placeholder geometry if STL fails
-          const geometry = new THREE.BoxGeometry(20, 5, 20);
-          const mesh = new THREE.Mesh(geometry, material);
-          mesh.position.y = yOffset;
-          scene.add(mesh);
-        });
-      }
-
-      // Load appropriate model based on selection
-      const design = state.design || 'wine';
-      loadSTL(`/${design}-bottom.stl`, materials.bottom, -10);
-      loadSTL(`/${design}-middle.stl`, materials.middle, 0);
-      loadSTL(`/${design}-top.stl`, materials.top, 10);
+      // Create placeholder geometries based on design type
+      createPlaceholderModel(state.design);
 
       // Color controls
       document.getElementById('colorBottom').addEventListener('input', e => {
@@ -659,10 +663,139 @@
         materials.top.color.set(e.target.value);
       });
 
+      // Start animation
       animate();
+
+      // Handle window resize
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function createPlaceholderModel(design) {
+      // Clear existing meshes
+      meshes.forEach(mesh => scene.remove(mesh));
+      meshes = [];
+
+      // Create different placeholder geometries based on design
+      switch(design) {
+        case 'wine':
+          // Wine glass shape
+          const wineBottom = new THREE.CylinderGeometry(8, 1, 3, 32);
+          const wineMiddle = new THREE.CylinderGeometry(1, 1, 8, 32);
+          const wineTop = new THREE.CylinderGeometry(1, 6, 8, 32);
+          
+          addMesh(wineBottom, materials.bottom, -5);
+          addMesh(wineMiddle, materials.middle, 0);
+          addMesh(wineTop, materials.top, 8);
+          break;
+          
+        case 'star':
+          // Star shape
+          const starShape = new THREE.Shape();
+          const outerRadius = 8;
+          const innerRadius = 4;
+          const spikes = 5;
+          
+          for (let i = 0; i < spikes * 2; i++) {
+            const angle = (i / (spikes * 2)) * Math.PI * 2;
+            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            if (i === 0) starShape.moveTo(x, y);
+            else starShape.lineTo(x, y);
+          }
+          
+          const extrudeSettings = { depth: 2, bevelEnabled: true, bevelThickness: 0.5 };
+          const starGeometry = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+          
+          addMesh(starGeometry, materials.bottom, -3);
+          addMesh(starGeometry, materials.middle, 0);
+          addMesh(starGeometry, materials.top, 3);
+          break;
+          
+        case 'crown':
+          // Crown shape
+          const crownBottom = new THREE.CylinderGeometry(8, 8, 2, 8);
+          const crownMiddle = new THREE.CylinderGeometry(8, 8, 4, 8);
+          const crownTop = new THREE.ConeGeometry(3, 4, 4);
+          
+          addMesh(crownBottom, materials.bottom, -3);
+          addMesh(crownMiddle, materials.middle, 0);
+          addMesh(crownTop, materials.top, 4);
+          break;
+          
+        default:
+          // Generic token shape
+          const tokenGeometry = new THREE.CylinderGeometry(8, 8, 2, 32);
+          addMesh(tokenGeometry, materials.bottom, -2);
+          addMesh(tokenGeometry, materials.middle, 0);
+          addMesh(tokenGeometry, materials.top, 2);
+      }
+
+      // Try to load actual STL files
+      loadSTLFiles(design);
+    }
+
+    function addMesh(geometry, material, yOffset) {
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.y = yOffset;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+      meshes.push(mesh);
+    }
+
+    function loadSTLFiles(design) {
+      const loader = new THREE.STLLoader();
+      
+      // Try to load actual STL files
+      ['bottom', 'middle', 'top'].forEach((layer, index) => {
+        const path = `/${design}-${layer}.stl`;
+        loader.load(path, 
+          (geometry) => {
+            // Success: replace placeholder with actual STL
+            geometry.center();
+            const material = materials[layer];
+            const yOffset = (index - 1) * 10;
+            
+            // Remove placeholder
+            if (meshes[index]) {
+              scene.remove(meshes[index]);
+            }
+            
+            // Add STL mesh
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.y = yOffset;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            meshes[index] = mesh;
+          },
+          (progress) => {
+            // Progress callback
+          },
+          (error) => {
+            // Error: keep the placeholder geometry
+            console.log(`Using placeholder for ${design}-${layer}.stl`);
+          }
+        );
+      });
+    }
+
+    function onWindowResize() {
+      if (!camera || !renderer) return;
+      
+      const viewer = document.getElementById('viewer');
+      const width = viewer.offsetWidth;
+      const height = viewer.offsetHeight;
+      
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
     }
 
     function animate() {
+      if (!renderer) return;
+      
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
