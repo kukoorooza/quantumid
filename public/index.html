@@ -131,52 +131,10 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    window.onload = () => {
       const viewer = document.getElementById('viewer');
-      const tokenTypeEl = document.getElementById('tokenType');
-      const quantityEl = document.getElementById('quantity');
-      const priceDisplay = document.getElementById('priceDisplay');
-      const premadeOptionsEl = document.getElementById('premadeOptions');
-
-      function calculatePrice() {
-        const type = tokenTypeEl.value;
-        const quantity = parseInt(quantityEl.value, 10);
-        let unitPrice;
-        if (type === 'premade') {
-          if (quantity >= 100) unitPrice = 5;
-          else if (quantity >= 50) unitPrice = 7;
-          else if (quantity >= 10) unitPrice = 8;
-          else unitPrice = 10;
-        } else {
-          if (quantity >= 100) unitPrice = 4;
-          else if (quantity >= 50) unitPrice = 6;
-          else if (quantity >= 10) unitPrice = 7;
-          else unitPrice = 9;
-        }
-        priceDisplay.textContent = `Total Price: $${unitPrice * quantity}`;
-      }
-
-      tokenTypeEl.addEventListener('change', () => {
-        premadeOptionsEl.style.display = tokenTypeEl.value === 'premade' ? 'block' : 'none';
-        calculatePrice();
-      });
-      quantityEl.addEventListener('input', calculatePrice);
-      calculatePrice();
-
-      document.querySelectorAll('.image-option').forEach(option => {
-        option.addEventListener('click', () => {
-          document.querySelectorAll('.image-option').forEach(o => o.classList.remove('selected'));
-          option.classList.add('selected');
-        });
-      });
-
-      document.getElementById('orderForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Order placed!');
-      });
-
-      const width = viewer.clientWidth;
-      const height = viewer.clientHeight;
+      const width = viewer.offsetWidth || 600;
+      const height = viewer.offsetHeight || 400;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -229,7 +187,7 @@
         renderer.render(scene, camera);
       }
       animate();
-    });
+    }
   </script>
 </body>
 </html>
