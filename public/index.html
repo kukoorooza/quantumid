@@ -944,7 +944,7 @@
                 
                 // Create mesh from STL
                 const mesh = new THREE.Mesh(geometry, materials[layer]);
-                mesh.position.y = (index - 1) * 15; // Stack layers
+                mesh.position.z = (index - 1) * 15; // Stack layers
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 mesh.name = layer;
