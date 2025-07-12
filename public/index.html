@@ -221,26 +221,122 @@
 
     .color-controls {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: 1fr;
       gap: 16px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
 
     .color-control {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
       border: 1px solid #d2d2d7;
       border-radius: 10px;
+      overflow: hidden;
     }
 
-    .color-control input[type="color"] {
-      width: 50px;
-      height: 50px;
-      border: none;
+    .color-control-header {
+      padding: 16px;
+      background: #fafafa;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s ease;
+    }
+
+    .color-control-header:hover {
+      background: #f0f0f0;
+    }
+
+    .color-control-header h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .selected-color {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-preview {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid #d2d2d7;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+      padding: 16px;
+      background: #fafafa;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .color-grid.expanded {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .color-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid #d2d2d7;
       border-radius: 8px;
       cursor: pointer;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .color-option:hover {
+      border-color: #0071e3;
+      transform: scale(1.02);
+    }
+
+    .color-option.selected {
+      border-color: #0071e3;
+      background: #f0f8ff;
+    }
+
+    .color-swatch {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid #d2d2d7;
+      flex-shrink: 0;
+    }
+
+    .color-name {
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .color-disclaimer {
+      font-size: 12px;
+      color: #86868b;
+      text-align: center;
+      margin-top: 16px;
+      padding: 0 16px;
+    }
+
+    .glow-disclaimer {
+      font-size: 11px;
+      color: #0071e3;
+      text-align: center;
+      margin-top: 8px;
+      padding: 12px;
+      background: #e6f2ff;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .glow-disclaimer.visible {
+      display: block;
     }
 
     #viewer {
@@ -447,18 +543,46 @@
             
             <div class="color-controls">
               <div class="color-control">
-                <label>Bottom Layer</label>
-                <input type="color" id="colorBottom" value="#c0c0c0">
+                <div class="color-control-header" data-layer="top">
+                  <h4>Top Layer</h4>
+                  <div class="selected-color">
+                    <span id="topColorName">Shiny Purple</span>
+                    <div class="color-preview" id="topColorPreview" style="background: #808080;"></div>
+                  </div>
+                </div>
+                <div class="color-grid" id="topColorGrid"></div>
               </div>
+              
               <div class="color-control">
-                <label>Middle Layer</label>
-                <input type="color" id="colorMiddle" value="#a0a0a0">
+                <div class="color-control-header" data-layer="middle">
+                  <h4>Middle Layer</h4>
+                  <div class="selected-color">
+                    <span id="middleColorName">Teal</span>
+                    <div class="color-preview" id="middleColorPreview" style="background: #a0a0a0;"></div>
+                  </div>
+                </div>
+                <div class="color-grid" id="middleColorGrid"></div>
               </div>
+              
               <div class="color-control">
-                <label>Top Layer</label>
-                <input type="color" id="colorTop" value="#808080">
+                <div class="color-control-header" data-layer="bottom">
+                  <h4>Bottom Layer</h4>
+                  <div class="selected-color">
+                    <span id="bottomColorName">Gold</span>
+                    <div class="color-preview" id="bottomColorPreview" style="background: #c0c0c0;"></div>
+                  </div>
+                </div>
+                <div class="color-grid" id="bottomColorGrid"></div>
               </div>
             </div>
+            
+            <div class="glow-disclaimer" id="glowDisclaimer">
+              Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
+            </div>
+            
+            <p class="color-disclaimer">
+              Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
+            </p>
           </div>
 
           <div class="price-summary">
@@ -609,6 +733,110 @@
       document.getElementById('totalPrice').textContent = `${total}`;
     }
 
+    // Color definitions
+    const colorOptions = [
+      { name: 'Glow in the Dark (Blue)', hex: '#E6F3FF', glowHex: '#0080FF', isGlow: true },
+      { name: 'Glow in the Dark (Green)', hex: '#E6FFE6', glowHex: '#00FF00', isGlow: true },
+      { name: 'Blue', hex: '#0066CC' },
+      { name: 'Red', hex: '#CC0000' },
+      { name: 'Chameleon Red-Orange', hex: '#FF4500' },
+      { name: 'Chameleon Green-Blue', hex: '#00CED1' },
+      { name: 'Galaxy Purple', hex: '#4B0082' },
+      { name: 'Black', hex: '#000000' },
+      { name: 'Gold', hex: '#FFD700' },
+      { name: 'Teal', hex: '#008B8B' },
+      { name: 'Dark Blue', hex: '#000080' },
+      { name: 'Neon Yellow', hex: '#FFFF00' },
+      { name: 'Shiny Emerald', hex: '#50C878' },
+      { name: 'Shiny Purple', hex: '#9370DB' },
+      { name: 'Green', hex: '#228B22' }
+    ];
+
+    // Color state
+    let selectedColors = {
+      top: { name: 'Shiny Purple', hex: '#9370DB' },
+      middle: { name: 'Teal', hex: '#008B8B' },
+      bottom: { name: 'Gold', hex: '#FFD700' }
+    };
+
+    // Initialize color selectors
+    function initColorSelectors() {
+      ['top', 'middle', 'bottom'].forEach(layer => {
+        const grid = document.getElementById(`${layer}ColorGrid`);
+        const header = document.querySelector(`[data-layer="${layer}"]`);
+        
+        // Create color options
+        colorOptions.forEach(color => {
+          const colorOption = document.createElement('div');
+          colorOption.className = 'color-option';
+          colorOption.dataset.colorName = color.name;
+          colorOption.dataset.colorHex = color.hex;
+          colorOption.dataset.isGlow = color.isGlow || false;
+          
+          const swatch = document.createElement('div');
+          swatch.className = 'color-swatch';
+          swatch.style.background = color.hex;
+          
+          const name = document.createElement('span');
+          name.className = 'color-name';
+          name.textContent = color.name;
+          
+          colorOption.appendChild(swatch);
+          colorOption.appendChild(name);
+          
+          // Set initial selection
+          if (color.name === selectedColors[layer].name) {
+            colorOption.classList.add('selected');
+          }
+          
+          // Click handler
+          colorOption.addEventListener('click', () => {
+            selectColor(layer, color);
+          });
+          
+          grid.appendChild(colorOption);
+        });
+        
+        // Toggle grid on header click
+        header.addEventListener('click', () => {
+          grid.classList.toggle('expanded');
+        });
+      });
+    }
+
+    function selectColor(layer, color) {
+      selectedColors[layer] = color;
+      
+      // Update UI
+      document.getElementById(`${layer}ColorName`).textContent = color.name;
+      document.getElementById(`${layer}ColorPreview`).style.background = color.hex;
+      
+      // Update selected state
+      const grid = document.getElementById(`${layer}ColorGrid`);
+      grid.querySelectorAll('.color-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.colorName === color.name);
+      });
+      
+      // Update 3D viewer
+      if (viewer3D && viewer3D.materials && viewer3D.materials[layer]) {
+        viewer3D.materials[layer].color.set(color.hex);
+      }
+      
+      // Check for glow disclaimer
+      updateGlowDisclaimer();
+      
+      // Collapse the grid
+      grid.classList.remove('expanded');
+    }
+
+    function updateGlowDisclaimer() {
+      const hasGlow = Object.values(selectedColors).some(color => color.isGlow);
+      document.getElementById('glowDisclaimer').classList.toggle('visible', hasGlow);
+    }
+
+    // Initialize colors on page load
+    document.addEventListener('DOMContentLoaded', initColorSelectors);
+
     // 3D Viewer with STL loading
     let viewer3D = null;
     let stlMeshes = [];
@@ -629,6 +857,14 @@
         viewer3D.renderer.dispose();
       }
       stlMeshes = [];
+      
+      // Declare rotation variables at the top level of this function
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+      let targetRotationX = 0;
+      let targetRotationY = 0;
+      let currentRotationX = 0;
+      let currentRotationY = 0;
       
       try {
         // Create scene
@@ -660,20 +896,20 @@
         directionalLight.castShadow = true;
         scene.add(directionalLight);
 
-        // Create materials for layers
+        // Create materials for layers with initial colors
         const materials = {
           bottom: new THREE.MeshPhongMaterial({ 
-            color: 0xc0c0c0,
+            color: selectedColors.bottom.hex,
             specular: 0x222222,
             shininess: 100
           }),
           middle: new THREE.MeshPhongMaterial({ 
-            color: 0xa0a0a0,
+            color: selectedColors.middle.hex,
             specular: 0x222222,
             shininess: 100
           }),
           top: new THREE.MeshPhongMaterial({ 
-            color: 0x808080,
+            color: selectedColors.top.hex,
             specular: 0x222222,
             shininess: 100
           })
@@ -741,18 +977,8 @@
           stlMeshes = placeholderMeshes;
         }
 
-        // Setup color controls
-        document.getElementById('colorBottom').addEventListener('input', (e) => {
-          materials.bottom.color.set(e.target.value);
-        });
-        
-        document.getElementById('colorMiddle').addEventListener('input', (e) => {
-          materials.middle.color.set(e.target.value);
-        });
-        
-        document.getElementById('colorTop').addEventListener('input', (e) => {
-          materials.top.color.set(e.target.value);
-        });
+        // Setup color controls - removed since we're using the new color selector
+        // Color updates are now handled by selectColor function
 
         // Mouse interaction
         let mouseX = 0;
@@ -767,14 +993,20 @@
         function animate() {
           requestAnimationFrame(animate);
 
-          // Smooth rotation based on mouse
-          targetRotationY = mouseX * Math.PI * 0.5;
+          // Smooth rotation interpolation
+          currentRotationY += (targetRotationY - currentRotationY) * 0.1;
+          currentRotationX += (targetRotationX - currentRotationX) * 0.1;
           
           // Update all meshes
           [...stlMeshes, ...placeholderMeshes].forEach(mesh => {
             if (mesh && mesh.parent) { // Check if mesh is in scene
-              mesh.rotation.y += (targetRotationY - mesh.rotation.y) * 0.05;
-              mesh.rotation.y += 0.003; // Slow auto-rotation
+              mesh.rotation.y = currentRotationY;
+              mesh.rotation.x = currentRotationX;
+              
+              // Slow auto-rotation when not dragging
+              if (!isDragging) {
+                targetRotationY += 0.002;
+              }
             }
           });
 
@@ -823,27 +1055,17 @@
 
     function updateSVGPreview() {
       const container = document.getElementById('viewer');
-      const colors = {
-        top: document.getElementById('colorTop').value,
-        middle: document.getElementById('colorMiddle').value,
-        bottom: document.getElementById('colorBottom').value
-      };
-
+      
       container.innerHTML = `
         <div class="viewer-placeholder">
           <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="60" r="40" fill="${colors.top}" opacity="0.8"/>
-            <circle cx="100" cy="100" r="45" fill="${colors.middle}" opacity="0.8"/>
-            <circle cx="100" cy="140" r="50" fill="${colors.bottom}" opacity="0.8"/>
+            <circle cx="100" cy="60" r="40" fill="${selectedColors.top.hex}" opacity="0.8"/>
+            <circle cx="100" cy="100" r="45" fill="${selectedColors.middle.hex}" opacity="0.8"/>
+            <circle cx="100" cy="140" r="50" fill="${selectedColors.bottom.hex}" opacity="0.8"/>
             <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
           </svg>
         </div>
       `;
-
-      // Update SVG when colors change
-      document.getElementById('colorBottom').addEventListener('input', updateSVGPreview);
-      document.getElementById('colorMiddle').addEventListener('input', updateSVGPreview);
-      document.getElementById('colorTop').addEventListener('input', updateSVGPreview);
     }
 
     // Form submission
@@ -859,9 +1081,9 @@
         nfcUrl: document.getElementById('nfcUrl').value,
         totalPrice: document.getElementById('totalPrice').textContent,
         colors: state.type === 'premade' ? {
-          bottom: document.getElementById('colorBottom').value,
-          middle: document.getElementById('colorMiddle').value,
-          top: document.getElementById('colorTop').value
+          bottom: selectedColors.bottom,
+          middle: selectedColors.middle,
+          top: selectedColors.top
         } : null
       };
       
