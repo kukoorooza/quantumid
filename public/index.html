@@ -839,7 +839,8 @@
 
     // 3D Viewer with STL loading
     let viewer3D = null;
-    
+    let stlMeshes = [];
+
     function init3DViewer() {
       // Check if THREE.js is loaded
       if (typeof THREE === 'undefined') {
@@ -855,6 +856,7 @@
       if (viewer3D && viewer3D.renderer) {
         viewer3D.renderer.dispose();
       }
+      stlMeshes = [];
       
       // Declare rotation variables at the top level of this function
       let isDragging = false;
@@ -869,11 +871,9 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xf5f5f7);
 
-        // *** MODIFICATION START ***
         // Create a group to hold all the meshes
         const group = new THREE.Group();
         scene.add(group);
-        // *** MODIFICATION END ***
 
         // Create camera
         const camera = new THREE.PerspectiveCamera(
@@ -919,10 +919,8 @@
           })
         };
 
-        // *** MODIFICATION START ***
         // Create placeholder meshes and add them to the group
         const placeholderMeshes = createPlaceholders(group, materials);
-        // *** MODIFICATION END ***
 
         // Try to load STL files
         if (typeof THREE.STLLoader !== 'undefined') {
@@ -938,10 +936,8 @@
               (geometry) => {
                 console.log(`Loaded ${filename}`);
                 
-                // *** MODIFICATION START ***
                 // Remove placeholder from the group
                 group.remove(placeholderMeshes[index]);
-                // *** MODIFICATION END ***
                 
                 // Center and scale geometry
                 geometry.computeBoundingBox();
@@ -952,15 +948,13 @@
                 
                 // Create mesh from STL
                 const mesh = new THREE.Mesh(geometry, materials[layer]);
-                mesh.position.z = (index - 1) * 15; // Stack layers
+                mesh.position.z = (index - 1) * 4; // Stack layers with new factor
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 mesh.name = layer;
                 
-                // *** MODIFICATION START ***
                 // Add the loaded mesh to the group
                 group.add(mesh);
-                // *** MODIFICATION END ***
                 
                 loadedCount++;
                 if (loadedCount === 1) {
@@ -986,26 +980,12 @@
         }
 
         // Mouse interaction
+        let mouseX = 0;
+        let targetRotationY = 0;
+
         container.addEventListener('mousemove', (e) => {
-          // This part can be enhanced for click-and-drag rotation
-          if (isDragging) {
-              const deltaX = e.clientX - previousMousePosition.x;
-              const deltaY = e.clientY - previousMousePosition.y;
-
-              targetRotationY += deltaX * 0.01;
-              targetRotationX += deltaY * 0.01;
-              
-              previousMousePosition = { x: e.clientX, y: e.clientY };
-          }
-        });
-
-        container.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
-
-        container.addEventListener('mouseup', () => {
-            isDragging = false;
+          const rect = container.getBoundingClientRect();
+          mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         });
 
         // Animation loop
@@ -1016,7 +996,6 @@
           currentRotationY += (targetRotationY - currentRotationY) * 0.1;
           currentRotationX += (targetRotationX - currentRotationX) * 0.1;
           
-          // *** MODIFICATION START ***
           // Rotate the entire group instead of individual meshes
           group.rotation.y = currentRotationY;
           group.rotation.x = currentRotationX;
@@ -1025,7 +1004,6 @@
           if (!isDragging) {
             targetRotationY += 0.002;
           }
-          // *** MODIFICATION END ***
 
           renderer.render(scene, camera);
         }
@@ -1047,11 +1025,11 @@
       }
     }
 
-    // *** MODIFICATION START ***
     // Modified to accept a group object to add meshes to
     function createPlaceholders(group, materials) {
       const meshes = [];
       
+      // Create three cylinders as placeholders
       const geometries = [
         new THREE.CylinderGeometry(25, 25, 5, 32), // bottom
         new THREE.CylinderGeometry(23, 23, 5, 32), // middle
@@ -1060,7 +1038,7 @@
       
       ['bottom', 'middle', 'top'].forEach((layer, index) => {
         const mesh = new THREE.Mesh(geometries[index], materials[layer]);
-        mesh.position.y = (index - 1) * 15;
+        mesh.position.y = (index - 1) * 4; // Stack layers with new factor
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.name = layer + '_placeholder';
@@ -1070,7 +1048,6 @@
       
       return meshes;
     }
-    // *** MODIFICATION END ***
 
     function updateSVGPreview() {
       const container = document.getElementById('viewer');
