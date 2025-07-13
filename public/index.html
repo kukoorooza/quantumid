@@ -450,7 +450,7 @@
             <h3 style="margin-bottom: 24px;">Select a Design</h3>
             <div class="design-grid">
               <div class="design-option" data-design="wine">
-                <img src="wineimg.png" alt="Wine Glass">
+                <img src="https://via.placeholder.com/80?text=Wine" alt="Wine Glass">
                 <div>Wine Glass</div>
               </div>
               <div class="design-option" data-design="heel">
@@ -944,7 +944,7 @@
                 
                 // Create mesh from STL
                 const mesh = new THREE.Mesh(geometry, materials[layer]);
-                mesh.position.z = (index - 1) * 15; // Stack layers
+                mesh.position.y = (index - 1) * 15; // Stack layers
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 mesh.name = layer;
@@ -977,53 +977,6 @@
           stlMeshes = placeholderMeshes;
         }
 
-        // Setup color controls - removed since we're using the new color selector
-        // Color updates are now handled by selectColor function
-
-        // Mouse interaction
-        let mouseX = 0;
-        let targetRotationY = 0;
-
-        container.addEventListener('mousemove', (e) => {
-          const rect = container.getBoundingClientRect();
-          mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        });
-
-        // Animation loop
-        function animate() {
-          requestAnimationFrame(animate);
-
-          // Smooth rotation interpolation
-          currentRotationY += (targetRotationY - currentRotationY) * 0.1;
-          currentRotationX += (targetRotationX - currentRotationX) * 0.1;
-          
-          // Update all meshes
-          [...stlMeshes, ...placeholderMeshes].forEach(mesh => {
-            if (mesh && mesh.parent) { // Check if mesh is in scene
-              mesh.rotation.y = currentRotationY;
-              mesh.rotation.x = currentRotationX;
-              
-              // Slow auto-rotation when not dragging
-              if (!isDragging) {
-                targetRotationY += 0.002;
-              }
-            }
-          });
-
-          renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-          camera.aspect = container.clientWidth / container.clientHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-
-        viewer3D = { scene, camera, renderer, materials };
-
       } catch (error) {
         console.error('Error initializing 3D viewer:', error);
         updateSVGPreview();
@@ -1042,7 +995,7 @@
       
       ['bottom', 'middle', 'top'].forEach((layer, index) => {
         const mesh = new THREE.Mesh(geometries[index], materials[layer]);
-        mesh.position.y = (index - 1) * 15;
+        mesh.position.z = (index - 1) * 7; // Stack layers along Z axis with spacing of 7
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.name = layer + '_placeholder';
