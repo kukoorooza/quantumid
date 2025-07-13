@@ -551,8 +551,8 @@
                 <div class="color-control-header" data-layer="top">
                   <h4>Top Layer</h4>
                   <div class="selected-color">
-                    <span id="topColorName">Shiny Purple</span>
-                    <div class="color-preview" id="topColorPreview" style="background: #808080;"></div>
+                    <span id="topColorName"></span>
+                    <div class="color-preview" id="topColorPreview"></div>
                   </div>
                 </div>
                 <div class="color-grid" id="topColorGrid"></div>
@@ -562,8 +562,8 @@
                 <div class="color-control-header" data-layer="middle">
                   <h4>Middle Layer</h4>
                   <div class="selected-color">
-                    <span id="middleColorName">Teal</span>
-                    <div class="color-preview" id="middleColorPreview" style="background: #a0a0a0;"></div>
+                    <span id="middleColorName"></span>
+                    <div class="color-preview" id="middleColorPreview"></div>
                   </div>
                 </div>
                 <div class="color-grid" id="middleColorGrid"></div>
@@ -573,8 +573,8 @@
                 <div class="color-control-header" data-layer="bottom">
                   <h4>Bottom Layer</h4>
                   <div class="selected-color">
-                    <span id="bottomColorName">Gold</span>
-                    <div class="color-preview" id="bottomColorPreview" style="background: #c0c0c0;"></div>
+                    <span id="bottomColorName"></span>
+                    <div class="color-preview" id="bottomColorPreview"></div>
                   </div>
                 </div>
                 <div class="color-grid" id="bottomColorGrid"></div>
@@ -689,9 +689,7 @@
         option.classList.add('selected');
         state.design = option.dataset.design;
         
-        // Show customizer for selected design
         customizerSection.classList.remove('hidden');
-        // Initialize 3D viewer
         init3DViewer();
       });
     });
@@ -716,7 +714,7 @@
     });
 
     function getUnitPrice() {
-      if (!state.type) return 10; // Default price
+      if (!state.type) return 10;
       
       const priceList = pricing[state.type];
       for (let tier of priceList) {
@@ -731,7 +729,6 @@
       const customTextFee = state.customText ? 50 : 0;
       const total = state.baseFee + (unitPrice * state.quantity) + customTextFee;
       
-      // Update price display
       document.getElementById('basePrice').style.display = state.baseFee > 0 ? 'flex' : 'none';
       document.getElementById('unitPrice').querySelector('span:last-child').textContent = `$${unitPrice}`;
       document.getElementById('quantityRow').querySelector('span:last-child').textContent = state.quantity;
@@ -746,9 +743,10 @@
       { name: 'Blue', hex: '#0066CC' },
       { name: 'Red', hex: '#CC0000' },
       { name: 'Chameleon Red-Orange', hex: '#FF4500' },
-      { name: 'Chameleon Green-Blue', hex: '#00CED1' },
+      { name: 'Chameleon Green-Blue', hex: '#006064' }, // Darkened color
       { name: 'Galaxy Purple', hex: '#4B0082' },
       { name: 'Black', hex: '#000000' },
+      { name: 'White', hex: '#FFFFFF' }, // Added white
       { name: 'Gold', hex: '#FFD700' },
       { name: 'Teal', hex: '#008B8B' },
       { name: 'Dark Blue', hex: '#000080' },
@@ -764,6 +762,15 @@
       middle: { name: 'Teal', hex: '#008B8B' },
       bottom: { name: 'Gold', hex: '#FFD700' }
     };
+    
+    // Function to set the initial state of the color UI
+    function initializeColorUI() {
+        ['top', 'middle', 'bottom'].forEach(layer => {
+            const color = selectedColors[layer];
+            document.getElementById(`${layer}ColorName`).textContent = color.name;
+            document.getElementById(`${layer}ColorPreview`).style.background = color.hex;
+        });
+    }
 
     // Initialize color selectors
     function initColorSelectors() {
@@ -831,7 +838,10 @@
       document.getElementById('glowDisclaimer').classList.toggle('visible', hasGlow);
     }
 
-    document.addEventListener('DOMContentLoaded', initColorSelectors);
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeColorUI();
+        initColorSelectors();
+    });
 
     // 3D Viewer
     let viewer3D = null;
@@ -904,7 +914,7 @@
               geometry.translate(-center.x, -center.y, -center.z);
               
               const mesh = new THREE.Mesh(geometry, materials[layer]);
-              mesh.position.z = (index - 1) * 2; // Shift along Z-axis
+              mesh.position.z = (index - 1) * 2;
               mesh.castShadow = true;
               mesh.receiveShadow = true;
               mesh.name = layer;
@@ -951,7 +961,7 @@
       
       ['bottom', 'middle', 'top'].forEach((layer, index) => {
         const mesh = new THREE.Mesh(geometries[index], materials[layer]);
-        mesh.position.z = (index - 1) * 2; // Shift along Z-axis
+        mesh.position.z = (index - 1) * 2;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.name = layer + '_placeholder';
