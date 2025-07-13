@@ -904,7 +904,7 @@
               geometry.translate(-center.x, -center.y, -center.z);
               
               const mesh = new THREE.Mesh(geometry, materials[layer]);
-              mesh.position.y = (index - 1) * 2;
+              mesh.position.z = (index - 1) * 2; // Shift along Z-axis
               mesh.castShadow = true;
               mesh.receiveShadow = true;
               mesh.name = layer;
@@ -951,7 +951,7 @@
       
       ['bottom', 'middle', 'top'].forEach((layer, index) => {
         const mesh = new THREE.Mesh(geometries[index], materials[layer]);
-        mesh.position.y = (index - 1) * 2;
+        mesh.position.z = (index - 1) * 2; // Shift along Z-axis
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.name = layer + '_placeholder';
