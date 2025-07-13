@@ -417,6 +417,53 @@
       margin-bottom: 24px;
     }
   </style>
+
+  <style>
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px 0;
+      }
+
+      .container {
+        padding: 0 15px;
+      }
+
+      .hero {
+        padding: 40px 0 30px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
+
+      .selection-section {
+        padding: 20px;
+      }
+
+      .token-type-selector {
+        grid-template-columns: 1fr;
+      }
+      
+      .design-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      #viewer {
+        height: 350px;
+      }
+      
+      .order-button {
+          width: 100%;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <header class="header">
@@ -743,10 +790,10 @@
       { name: 'Blue', hex: '#0066CC' },
       { name: 'Red', hex: '#CC0000' },
       { name: 'Chameleon Red-Orange', hex: '#FF4500' },
-      { name: 'Chameleon Green-Blue', hex: '#006064' }, // Darkened color
+      { name: 'Chameleon Green-Blue', hex: '#006064' },
       { name: 'Galaxy Purple', hex: '#4B0082' },
       { name: 'Black', hex: '#000000' },
-      { name: 'White', hex: '#FFFFFF' }, // Added white
+      { name: 'White', hex: '#FFFFFF' },
       { name: 'Gold', hex: '#FFD700' },
       { name: 'Teal', hex: '#008B8B' },
       { name: 'Dark Blue', hex: '#000080' },
@@ -763,7 +810,6 @@
       bottom: { name: 'Gold', hex: '#FFD700' }
     };
     
-    // Function to set the initial state of the color UI
     function initializeColorUI() {
         ['top', 'middle', 'bottom'].forEach(layer => {
             const color = selectedColors[layer];
@@ -778,7 +824,7 @@
         const grid = document.getElementById(`${layer}ColorGrid`);
         const header = document.querySelector(`[data-layer="${layer}"]`);
         
-        grid.innerHTML = ''; // Clear previous options
+        grid.innerHTML = '';
         colorOptions.forEach(color => {
           const colorOption = document.createElement('div');
           colorOption.className = 'color-option';
