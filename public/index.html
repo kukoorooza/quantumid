@@ -130,6 +130,65 @@
         margin: 0 auto;
         line-height: 1.3;
     }
+    
+    .video-section {
+        text-align: center;
+        padding: 40px 20px 80px;
+    }
+    
+    .video-section h2 {
+        font-size: 36px;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+    
+    .video-toggle-button {
+        background: none;
+        border: 2px solid #0071e3;
+        color: #0071e3;
+        padding: 12px 24px;
+        font-size: 17px;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .video-toggle-button:hover {
+        background: #e6f2ff;
+    }
+    
+    .video-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 40px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.7s ease-in-out;
+    }
+    
+    .video-container.expanded {
+        max-height: 1000px; /* Adjust if needed for more videos */
+    }
+    
+    .video-placeholder {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        background: #333;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .video-placeholder::after {
+        content: '▶';
+        color: white;
+        font-size: 50px;
+        opacity: 0.7;
+    }
 
     .hero {
       text-align: center;
@@ -535,6 +594,10 @@
       .pitch-section h2 {
           font-size: 28px;
       }
+      
+      .video-container {
+          grid-template-columns: 1fr;
+      }
 
       .hero {
         padding: 40px 0 30px;
@@ -601,6 +664,16 @@
         <div class="container">
             <div class="keychain-placeholder"></div>
             <h2>Your networking doesn't stop when the conversation ends.</h2>
+        </div>
+    </div>
+    
+    <div class="video-section container">
+        <h2>See QuantumID in Action</h2>
+        <button id="video-toggle" class="video-toggle-button">Show Video Examples ▼</button>
+        <div id="video-container" class="video-container">
+            <div class="video-placeholder"></div>
+            <div class="video-placeholder"></div>
+            <div class="video-placeholder"></div>
         </div>
     </div>
   
@@ -1016,6 +1089,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         initializeColorUI();
         initColorSelectors();
+        
+        // Video Section Toggle
+        const videoToggle = document.getElementById('video-toggle');
+        const videoContainer = document.getElementById('video-container');
+        videoToggle.addEventListener('click', () => {
+            const isExpanded = videoContainer.classList.toggle('expanded');
+            videoToggle.textContent = isExpanded ? 'Hide Video Examples ▲' : 'Show Video Examples ▼';
+        });
     });
 
     // 3D Viewer
