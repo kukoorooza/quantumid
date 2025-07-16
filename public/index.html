@@ -844,11 +844,13 @@
     const designLayers = {
         default: {
             layers: ['bottom', 'middle', 'top'],
-            labels: ['Bottom Layer', 'Middle Layer', 'Top Layer']
+            labels: ['Bottom Layer', 'Middle Layer', 'Top Layer'],
+            spacing: 2
         },
         lips: {
             layers: ['bottom', 'middle', 'top', 'extra'],
-            labels: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4']
+            labels: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4'],
+            spacing: 1.5
         }
     };
     
@@ -929,7 +931,6 @@
         if (state.type === 'premade') {
           premadeSection.classList.remove('hidden');
           customSection.classList.add('hidden');
-          // If no design is selected yet, don't show customizer
           if(state.design) customizerSection.classList.remove('hidden');
 
         } else {
@@ -996,11 +997,9 @@
       document.getElementById('totalPrice').textContent = `$${total}`;
     }
     
-    // --- Dynamic Color Control Functions ---
-
     function setupColorControls(design) {
         const config = designLayers[design] || designLayers.default;
-        colorControlsContainer.innerHTML = ''; // Clear existing controls
+        colorControlsContainer.innerHTML = ''; 
 
         config.layers.forEach((layerKey, index) => {
             const label = config.labels[index];
@@ -1083,7 +1082,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Video Section Toggle
         const videoToggle = document.getElementById('video-toggle');
         const videoContainer = document.getElementById('video-container');
         videoToggle.addEventListener('click', () => {
@@ -1092,7 +1090,6 @@
         });
     });
 
-    // 3D Viewer
     let viewer3D = null;
     
     function init3DViewer() {
@@ -1142,13 +1139,14 @@
         
         const currentDesignConfig = designLayers[state.design] || designLayers.default;
         const layersToRender = currentDesignConfig.layers;
+        const spacing = currentDesignConfig.spacing;
 
         const materials = {};
         layersToRender.forEach(layerKey => {
             materials[layerKey] = new THREE.MeshPhongMaterial({ color: selectedColors[layerKey].hex, specular: 0x222222, shininess: 100 });
         });
 
-        const placeholderMeshes = createPlaceholders(group, materials, layersToRender);
+        const placeholderMeshes = createPlaceholders(group, materials, layersToRender, spacing);
 
         if (typeof THREE.STLLoader !== 'undefined') {
           const loader = new THREE.STLLoader();
@@ -1168,7 +1166,7 @@
               const mesh = new THREE.Mesh(geometry, materials[layerKey]);
               
               const offset = (layersToRender.length - 1) / 2.0;
-              mesh.position.z = (index - offset) * 2;
+              mesh.position.z = (index - offset) * spacing;
               
               mesh.castShadow = true;
               mesh.receiveShadow = true;
@@ -1206,19 +1204,19 @@
       }
     }
 
-    function createPlaceholders(group, materials, layers) {
+    function createPlaceholders(group, materials, layers, spacing) {
       const meshes = [];
       const geometries = [
         new THREE.CylinderGeometry(25, 25, 5, 32),
         new THREE.CylinderGeometry(23, 23, 5, 32),
         new THREE.CylinderGeometry(21, 21, 5, 32),
-        new THREE.CylinderGeometry(19, 19, 5, 32) // Placeholder for 4th layer
+        new THREE.CylinderGeometry(19, 19, 5, 32)
       ];
       
       const offset = (layers.length - 1) / 2.0;
       layers.forEach((layerKey, index) => {
         const mesh = new THREE.Mesh(geometries[index], materials[layerKey]);
-        mesh.position.z = (index - offset) * 2;
+        mesh.position.z = (index - offset) * spacing;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.name = layerKey + '_placeholder';
@@ -1245,3 +1243,4 @@
   </script>
 </body>
 </html>
+}
