@@ -84,9 +84,20 @@
     }
 
     .photo-placeholder {
+        position: relative;
         width: 100%;
         padding-bottom: 100%; /* Makes it a square */
         background: rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+    }
+    
+    .photo-placeholder img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         border-radius: 12px;
     }
     
@@ -115,12 +126,12 @@
         margin: 40px auto;
     }
     
-    .pitch-section .keychain-placeholder {
+    .keychain-image {
         width: 150px;
         height: 150px;
-        background: rgba(0, 0, 0, 0.05);
         border-radius: 50%;
         margin: 0 auto 30px;
+        object-fit: cover;
     }
 
     .pitch-section h2 {
@@ -298,6 +309,7 @@
     .form-group input[type="text"],
     .form-group input[type="number"],
     .form-group input[type="url"],
+    .form-group input[type="email"],
     .form-group textarea,
     .form-group select {
       width: 100%;
@@ -651,10 +663,18 @@
                 Redefine your network with QuantumID, the digital business card that makes a lasting impression with a single tap.
             </p>
             <div class="photo-grid">
-                <div class="photo-placeholder"></div>
-                <div class="photo-placeholder"></div>
-                <div class="photo-placeholder"></div>
-                <div class="photo-placeholder"></div>
+                <div class="photo-placeholder">
+                    <img src="image1.png" alt="QuantumID product example 1">
+                </div>
+                <div class="photo-placeholder">
+                    <img src="image2.png" alt="QuantumID product example 2">
+                </div>
+                <div class="photo-placeholder">
+                    <img src="image3.png" alt="QuantumID product example 3">
+                </div>
+                <div class="photo-placeholder">
+                    <img src="image4.png" alt="QuantumID product example 4">
+                </div>
             </div>
             <a href="#order-section" class="cta-button">Create Your QuantumID</a>
         </div>
@@ -662,7 +682,7 @@
     
     <div class="pitch-section">
         <div class="container">
-            <div class="keychain-placeholder"></div>
+            <img src="keychainimg.png" alt="QuantumID on a keychain" class="keychain-image">
             <h2>Your networking doesn't stop when the conversation ends.</h2>
         </div>
     </div>
@@ -779,6 +799,11 @@
             <div class="form-group">
               <label>NFC Link URL</label>
               <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="emailAddress">Your Email Address</label>
+              <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required>
             </div>
 
             <div class="customizer-section hidden" id="customizerSection">
@@ -1243,4 +1268,3 @@
   </script>
 </body>
 </html>
-}
