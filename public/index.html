@@ -795,40 +795,8 @@
                 </div>
               </div>
               
-              <div class="color-controls">
-                <div class="color-control">
-                  <div class="color-control-header" data-layer="top">
-                    <h4>Top Layer</h4>
-                    <div class="selected-color">
-                      <span id="topColorName"></span>
-                      <div class="color-preview" id="topColorPreview"></div>
-                    </div>
-                  </div>
-                  <div class="color-grid" id="topColorGrid"></div>
+              <div class="color-controls" id="colorControls">
                 </div>
-                
-                <div class="color-control">
-                  <div class="color-control-header" data-layer="middle">
-                    <h4>Middle Layer</h4>
-                    <div class="selected-color">
-                      <span id="middleColorName"></span>
-                      <div class="color-preview" id="middleColorPreview"></div>
-                    </div>
-                  </div>
-                  <div class="color-grid" id="middleColorGrid"></div>
-                </div>
-                
-                <div class="color-control">
-                  <div class="color-control-header" data-layer="bottom">
-                    <h4>Bottom Layer</h4>
-                    <div class="selected-color">
-                      <span id="bottomColorName"></span>
-                      <div class="color-preview" id="bottomColorPreview"></div>
-                    </div>
-                  </div>
-                  <div class="color-grid" id="bottomColorGrid"></div>
-                </div>
-              </div>
               
               <div class="glow-disclaimer" id="glowDisclaimer">
                 Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
@@ -872,6 +840,43 @@
   <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/STLLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script>
+    // Layer and Color Configuration
+    const designLayers = {
+        default: {
+            layers: ['bottom', 'middle', 'top'],
+            labels: ['Bottom Layer', 'Middle Layer', 'Top Layer']
+        },
+        lips: {
+            layers: ['bottom', 'middle', 'top', 'extra'],
+            labels: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4']
+        }
+    };
+    
+    const colorOptions = [
+      { name: 'Glow in the Dark (Blue)', hex: '#E6F3FF', glowHex: '#0080FF', isGlow: true },
+      { name: 'Glow in the Dark (Green)', hex: '#E6FFE6', glowHex: '#00FF00', isGlow: true },
+      { name: 'Red', hex: '#CC0000' },
+      { name: 'Chameleon Red-Orange', hex: '#FF4500' },
+      { name: 'Chameleon Green-Blue', hex: '#006064' },
+      { name: 'Galaxy Purple', hex: '#4B0082' },
+      { name: 'Black', hex: '#000000' },
+      { name: 'White', hex: '#FFFFFF' },
+      { name: 'Gold', hex: '#FFD700' },
+      { name: 'Teal', hex: '#008B8B' },
+      { name: 'Dark Blue', hex: '#000080' },
+      { name: 'Neon Yellow', hex: '#FFFF00' },
+      { name: 'Shiny Emerald', hex: '#50C878' },
+      { name: 'Shiny Purple', hex: '#9370DB' },
+      { name: 'Green', hex: '#228B22' }
+    ];
+
+    let selectedColors = {
+      bottom: { name: 'Gold', hex: '#FFD700' },
+      middle: { name: 'Teal', hex: '#008B8B' },
+      top: { name: 'Shiny Purple', hex: '#9370DB' },
+      extra: { name: 'Red', hex: '#CC0000' } // Default for the 4th layer
+    };
+
     // Pricing structure
     const pricing = {
       premade: [
@@ -909,6 +914,8 @@
     const customTextOption = document.getElementById('customTextOption');
     const fileInput = document.getElementById('customFile');
     const fileLabel = document.querySelector('.file-upload-label span');
+    const colorControlsContainer = document.getElementById('colorControls');
+
 
     // Event listeners
     typeOptions.forEach(option => {
@@ -922,6 +929,9 @@
         if (state.type === 'premade') {
           premadeSection.classList.remove('hidden');
           customSection.classList.add('hidden');
+          // If no design is selected yet, don't show customizer
+          if(state.design) customizerSection.classList.remove('hidden');
+
         } else {
           premadeSection.classList.add('hidden');
           customSection.classList.remove('hidden');
@@ -938,6 +948,7 @@
         option.classList.add('selected');
         state.design = option.dataset.design;
         
+        setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
       });
@@ -984,97 +995,82 @@
       document.getElementById('customTextPrice').style.display = state.customText ? 'flex' : 'none';
       document.getElementById('totalPrice').textContent = `$${total}`;
     }
-
-    // Color definitions
-    const colorOptions = [
-      { name: 'Glow in the Dark (Blue)', hex: '#E6F3FF', glowHex: '#0080FF', isGlow: true },
-      { name: 'Glow in the Dark (Green)', hex: '#E6FFE6', glowHex: '#00FF00', isGlow: true },
-      { name: 'Blue', hex: '#0066CC' },
-      { name: 'Red', hex: '#CC0000' },
-      { name: 'Chameleon Red-Orange', hex: '#FF4500' },
-      { name: 'Chameleon Green-Blue', hex: '#006064' },
-      { name: 'Galaxy Purple', hex: '#4B0082' },
-      { name: 'Black', hex: '#000000' },
-      { name: 'White', hex: '#FFFFFF' },
-      { name: 'Gold', hex: '#FFD700' },
-      { name: 'Teal', hex: '#008B8B' },
-      { name: 'Dark Blue', hex: '#000080' },
-      { name: 'Neon Yellow', hex: '#FFFF00' },
-      { name: 'Shiny Emerald', hex: '#50C878' },
-      { name: 'Shiny Purple', hex: '#9370DB' },
-      { name: 'Green', hex: '#228B22' }
-    ];
-
-    // Color state
-    let selectedColors = {
-      top: { name: 'Shiny Purple', hex: '#9370DB' },
-      middle: { name: 'Teal', hex: '#008B8B' },
-      bottom: { name: 'Gold', hex: '#FFD700' }
-    };
     
-    function initializeColorUI() {
-        ['top', 'middle', 'bottom'].forEach(layer => {
-            const color = selectedColors[layer];
-            document.getElementById(`${layer}ColorName`).textContent = color.name;
-            document.getElementById(`${layer}ColorPreview`).style.background = color.hex;
-        });
-    }
+    // --- Dynamic Color Control Functions ---
 
-    // Initialize color selectors
-    function initColorSelectors() {
-      ['top', 'middle', 'bottom'].forEach(layer => {
-        const grid = document.getElementById(`${layer}ColorGrid`);
-        const header = document.querySelector(`[data-layer="${layer}"]`);
-        
-        grid.innerHTML = '';
-        colorOptions.forEach(color => {
-          const colorOption = document.createElement('div');
-          colorOption.className = 'color-option';
-          colorOption.dataset.colorName = color.name;
-          colorOption.dataset.colorHex = color.hex;
-          colorOption.dataset.isGlow = color.isGlow || false;
-          
-          const swatch = document.createElement('div');
-          swatch.className = 'color-swatch';
-          swatch.style.background = color.hex;
-          
-          const name = document.createElement('span');
-          name.className = 'color-name';
-          name.textContent = color.name;
-          
-          colorOption.appendChild(swatch);
-          colorOption.appendChild(name);
-          
-          if (color.name === selectedColors[layer].name) {
-            colorOption.classList.add('selected');
-          }
-          
-          colorOption.addEventListener('click', () => {
-            selectColor(layer, color);
-          });
-          
-          grid.appendChild(colorOption);
+    function setupColorControls(design) {
+        const config = designLayers[design] || designLayers.default;
+        colorControlsContainer.innerHTML = ''; // Clear existing controls
+
+        config.layers.forEach((layerKey, index) => {
+            const label = config.labels[index];
+            const control = createColorControlElement(layerKey, label);
+            colorControlsContainer.appendChild(control);
         });
         
-        header.addEventListener('click', () => {
-          grid.classList.toggle('expanded');
+        updateGlowDisclaimer();
+    }
+    
+    function createColorControlElement(layerKey, label) {
+        const color = selectedColors[layerKey];
+
+        const controlDiv = document.createElement('div');
+        controlDiv.className = 'color-control';
+        controlDiv.innerHTML = `
+            <div class="color-control-header" data-layer="${layerKey}">
+                <h4>${label}</h4>
+                <div class="selected-color">
+                    <span id="${layerKey}ColorName">${color.name}</span>
+                    <div class="color-preview" id="${layerKey}ColorPreview" style="background: ${color.hex};"></div>
+                </div>
+            </div>
+            <div class="color-grid" id="${layerKey}ColorGrid"></div>
+        `;
+
+        const grid = controlDiv.querySelector(`#${layerKey}ColorGrid`);
+        colorOptions.forEach(opt => {
+            const colorOption = createColorOptionElement(opt, layerKey);
+            if (opt.name === color.name) {
+                colorOption.classList.add('selected');
+            }
+            grid.appendChild(colorOption);
         });
-      });
+
+        const header = controlDiv.querySelector('.color-control-header');
+        header.addEventListener('click', () => grid.classList.toggle('expanded'));
+
+        return controlDiv;
+    }
+    
+    function createColorOptionElement(color, layerKey) {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'color-option';
+        optionDiv.dataset.colorName = color.name;
+        optionDiv.dataset.colorHex = color.hex;
+        optionDiv.dataset.isGlow = color.isGlow || false;
+        
+        optionDiv.innerHTML = `
+            <div class="color-swatch" style="background: ${color.hex};"></div>
+            <span class="color-name">${color.name}</span>
+        `;
+        
+        optionDiv.addEventListener('click', () => selectColor(layerKey, color));
+        return optionDiv;
     }
 
-    function selectColor(layer, color) {
-      selectedColors[layer] = color;
+    function selectColor(layerKey, color) {
+      selectedColors[layerKey] = color;
       
-      document.getElementById(`${layer}ColorName`).textContent = color.name;
-      document.getElementById(`${layer}ColorPreview`).style.background = color.hex;
+      document.getElementById(`${layerKey}ColorName`).textContent = color.name;
+      document.getElementById(`${layerKey}ColorPreview`).style.background = color.hex;
       
-      const grid = document.getElementById(`${layer}ColorGrid`);
+      const grid = document.getElementById(`${layerKey}ColorGrid`);
       grid.querySelectorAll('.color-option').forEach(opt => {
         opt.classList.toggle('selected', opt.dataset.colorName === color.name);
       });
       
-      if (viewer3D && viewer3D.materials && viewer3D.materials[layer]) {
-        viewer3D.materials[layer].color.set(color.hex);
+      if (viewer3D && viewer3D.materials && viewer3D.materials[layerKey]) {
+        viewer3D.materials[layerKey].color.set(color.hex);
       }
       
       updateGlowDisclaimer();
@@ -1087,9 +1083,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        initializeColorUI();
-        initColorSelectors();
-        
         // Video Section Toggle
         const videoToggle = document.getElementById('video-toggle');
         const videoContainer = document.getElementById('video-container');
@@ -1146,34 +1139,40 @@
         directionalLight.position.set(10, 10, 5);
         directionalLight.castShadow = true;
         scene.add(directionalLight);
+        
+        const currentDesignConfig = designLayers[state.design] || designLayers.default;
+        const layersToRender = currentDesignConfig.layers;
 
-        const materials = {
-          bottom: new THREE.MeshPhongMaterial({ color: selectedColors.bottom.hex, specular: 0x222222, shininess: 100 }),
-          middle: new THREE.MeshPhongMaterial({ color: selectedColors.middle.hex, specular: 0x222222, shininess: 100 }),
-          top: new THREE.MeshPhongMaterial({ color: selectedColors.top.hex, specular: 0x222222, shininess: 100 })
-        };
+        const materials = {};
+        layersToRender.forEach(layerKey => {
+            materials[layerKey] = new THREE.MeshPhongMaterial({ color: selectedColors[layerKey].hex, specular: 0x222222, shininess: 100 });
+        });
 
-        const placeholderMeshes = createPlaceholders(group, materials);
+        const placeholderMeshes = createPlaceholders(group, materials, layersToRender);
 
         if (typeof THREE.STLLoader !== 'undefined') {
           const loader = new THREE.STLLoader();
-          const design = state.design || 'wine';
+          const design = state.design;
           
-          ['bottom', 'middle', 'top'].forEach((layer, index) => {
-            const filename = `${design}-${layer}.stl`;
+          layersToRender.forEach((layerKey, index) => {
+            const filename = `${design}-${layerKey}.stl`;
             loader.load(filename, (geometry) => {
-              group.remove(placeholderMeshes[index]);
+              if(placeholderMeshes[index]) group.remove(placeholderMeshes[index]);
+              
               geometry.computeBoundingBox();
               const bbox = geometry.boundingBox;
               const center = new THREE.Vector3();
               bbox.getCenter(center);
               geometry.translate(-center.x, -center.y, -center.z);
               
-              const mesh = new THREE.Mesh(geometry, materials[layer]);
-              mesh.position.z = (index - 1) * 2;
+              const mesh = new THREE.Mesh(geometry, materials[layerKey]);
+              
+              const offset = (layersToRender.length - 1) / 2.0;
+              mesh.position.z = (index - offset) * 2;
+              
               mesh.castShadow = true;
               mesh.receiveShadow = true;
-              mesh.name = layer;
+              mesh.name = layerKey;
               group.add(mesh);
 
               const size = new THREE.Vector3();
@@ -1186,7 +1185,9 @@
             });
           });
         }
-
+        
+        viewer3D = { scene, camera, renderer, materials, group };
+        
         function animate() {
           requestAnimationFrame(animate);
           controls.update();
@@ -1200,36 +1201,31 @@
           renderer.setSize(container.clientWidth, container.clientHeight);
         });
 
-        viewer3D = { scene, camera, renderer, materials, group };
       } catch (error) {
         console.error('Error initializing 3D viewer:', error);
-        updateSVGPreview();
       }
     }
 
-    function createPlaceholders(group, materials) {
+    function createPlaceholders(group, materials, layers) {
       const meshes = [];
       const geometries = [
         new THREE.CylinderGeometry(25, 25, 5, 32),
         new THREE.CylinderGeometry(23, 23, 5, 32),
-        new THREE.CylinderGeometry(21, 21, 5, 32)
+        new THREE.CylinderGeometry(21, 21, 5, 32),
+        new THREE.CylinderGeometry(19, 19, 5, 32) // Placeholder for 4th layer
       ];
       
-      ['bottom', 'middle', 'top'].forEach((layer, index) => {
-        const mesh = new THREE.Mesh(geometries[index], materials[layer]);
-        mesh.position.z = (index - 1) * 2;
+      const offset = (layers.length - 1) / 2.0;
+      layers.forEach((layerKey, index) => {
+        const mesh = new THREE.Mesh(geometries[index], materials[layerKey]);
+        mesh.position.z = (index - offset) * 2;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        mesh.name = layer + '_placeholder';
+        mesh.name = layerKey + '_placeholder';
         group.add(mesh);
         meshes.push(mesh);
       });
       return meshes;
-    }
-
-    function updateSVGPreview() {
-      const container = document.getElementById('viewer');
-      container.innerHTML = `<div class="viewer-placeholder"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="60" r="40" fill="${selectedColors.top.hex}" opacity="0.8"/><circle cx="100" cy="100" r="45" fill="${selectedColors.middle.hex}" opacity="0.8"/><circle cx="100" cy="140" r="50" fill="${selectedColors.bottom.hex}" opacity="0.8"/><text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text></svg></div>`;
     }
 
     document.getElementById('orderForm').addEventListener('submit', (e) => {
