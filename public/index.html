@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuantumID - Premium NFC Tokens</title>
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     * {
       margin: 0;
@@ -128,7 +129,7 @@
     
     .keychain-image {
         width: 300px;
-        height: 400px;
+        height: 300px;
         border-radius: 18px;
         margin: 0 auto 30px;
         object-fit: cover;
@@ -571,6 +572,17 @@
       font-weight: 600;
       margin-bottom: 24px;
     }
+    
+    #payment-section {
+        margin-top: 40px;
+    }
+    
+    #payment-message {
+        text-align: center;
+        margin-top: 20px;
+        font-weight: 500;
+        color: #d92d20;
+    }
   </style>
 
   <style>
@@ -701,162 +713,174 @@
     <div class="container">
       <div id="order-section" class="selection-section">
         <form id="orderForm">
-            <div class="hero">
-                <h1>Order Your QuantumID</h1>
-                <p>Premium NFC-enabled tokens, crafted to perfection</p>
-            </div>
-          
-            <h2 class="section-title">Choose Your Token Type</h2>
-            
-            <div class="token-type-selector">
-              <div class="type-option" data-type="premade">
-                <h3>Premade Designs</h3>
-                <p>Choose from our curated collection</p>
-                <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">Starting at $10</p>
-              </div>
-              <div class="type-option" data-type="custom">
-                <h3>Custom Design</h3>
-                <p>Create your unique token</p>
-                <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">$500 base + unit price</p>
-              </div>
-            </div>
-
-            <div id="premadeSection" class="hidden">
-              <h3 style="margin-bottom: 24px;">Select a Design</h3>
-              <div class="design-grid">
-                <div class="design-option" data-design="wine">
-                  <img src="wineimg.png" alt="Wine Glass">
-                  <div>Wine Glass</div>
-                </div>
-                <div class="design-option" data-design="heel">
-                  <img src="heelimg.png" alt="High Heel">
-                  <div>High Heel</div>
-                </div>
-                <div class="design-option" data-design="tire">
-                  <img src="tireimg.png" alt="Tire">
-                  <div>Tire</div>
-                </div>
-                <div class="design-option" data-design="star">
-                  <img src="starimg.png" alt="Star">
-                  <div>Star</div>
-                </div>
-                <div class="design-option" data-design="crown">
-                  <img src="crownimg.png" alt="Crown">
-                  <div>Crown</div>
-                </div>
-                <div class="design-option" data-design="lips">
-                  <img src="lipsimg.png" alt="Lips">
-                  <div>Lips</div>
-                </div>
-                <div class="design-option" data-design="mic">
-                  <img src="micimg.png" alt="Microphone">
-                  <div>Microphone</div>
-                </div>
-                <div class="design-option" data-design="car">
-                  <img src="carimg.png" alt="Car">
-                  <div>Car</div>
-                </div>
-                <div class="design-option" data-design="leaf">
-                  <img src="leafimg.png" alt="Leaf">
-                  <div>Leaf</div>
-                </div>
-                <div class="design-option" data-design="house">
-                  <img src="houseimg.png" alt="House">
-                  <div>House</div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div class="checkbox-group" id="customTextOption">
-                  <input type="checkbox" id="addCustomText" name="addCustomText">
-                  <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
-                </div>
-                <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden" style="margin-top: 16px;">
-              </div>
-            </div>
-
-            <div id="customSection" class="hidden">
-              <div class="form-group">
-                <label>Describe Your Custom Design</label>
-                <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
-              </div>
-
-              <div class="form-group">
-                <label>Upload Reference Image (Optional)</label>
-                <div class="file-upload">
-                  <input type="file" id="customFile" name="customFile" accept="image/*">
-                  <label for="customFile" class="file-upload-label">
-                    <span>Click to upload or drag and drop</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Quantity</label>
-              <input type="number" id="quantity" name="quantity" value="1" min="1">
-            </div>
-
-            <div class="form-group">
-              <label>NFC Link URL</label>
-              <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
-            </div>
-
-            <div class="form-group">
-              <label for="emailAddress">Your Email Address</label>
-              <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required>
-            </div>
-
-            <div class="customizer-section hidden" id="customizerSection">
-              <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
-              
-              <div id="viewer">
-                <div class="viewer-placeholder">
-                  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="60" r="40" fill="#808080" opacity="0.8"/>
-                    <circle cx="100" cy="100" r="45" fill="#a0a0a0" opacity="0.8"/>
-                    <circle cx="100" cy="140" r="50" fill="#c0c0c0" opacity="0.8"/>
-                    <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
-                  </svg>
-                </div>
-              </div>
-              
-              <div class="color-controls" id="colorControls">
+            <div id="main-form-content">
+                <div class="hero">
+                    <h1>Order Your QuantumID</h1>
+                    <p>Premium NFC-enabled tokens, crafted to perfection</p>
                 </div>
               
-              <div class="glow-disclaimer" id="glowDisclaimer">
-                Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
-              </div>
-              
-              <p class="color-disclaimer">
-                Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
-              </p>
+                <h2 class="section-title">Choose Your Token Type</h2>
+                
+                <div class="token-type-selector">
+                  <div class="type-option" data-type="premade">
+                    <h3>Premade Designs</h3>
+                    <p>Choose from our curated collection</p>
+                    <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">Starting at $10</p>
+                  </div>
+                  <div class="type-option" data-type="custom">
+                    <h3>Custom Design</h3>
+                    <p>Create your unique token</p>
+                    <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">$500 base + unit price</p>
+                  </div>
+                </div>
+
+                <div id="premadeSection" class="hidden">
+                  <h3 style="margin-bottom: 24px;">Select a Design</h3>
+                  <div class="design-grid">
+                    <div class="design-option" data-design="wine">
+                      <img src="wineimg.png" alt="Wine Glass">
+                      <div>Wine Glass</div>
+                    </div>
+                    <div class="design-option" data-design="heel">
+                      <img src="heelimg.png" alt="High Heel">
+                      <div>High Heel</div>
+                    </div>
+                    <div class="design-option" data-design="tire">
+                      <img src="tireimg.png" alt="Tire">
+                      <div>Tire</div>
+                    </div>
+                    <div class="design-option" data-design="star">
+                      <img src="starimg.png" alt="Star">
+                      <div>Star</div>
+                    </div>
+                    <div class="design-option" data-design="crown">
+                      <img src="crownimg.png" alt="Crown">
+                      <div>Crown</div>
+                    </div>
+                    <div class="design-option" data-design="lips">
+                      <img src="lipsimg.png" alt="Lips">
+                      <div>Lips</div>
+                    </div>
+                    <div class="design-option" data-design="mic">
+                      <img src="micimg.png" alt="Microphone">
+                      <div>Microphone</div>
+                    </div>
+                    <div class="design-option" data-design="book">
+                      <img src="bookimg.png" alt="Book">
+                      <div>Book</div>
+                    </div>
+                    <div class="design-option" data-design="leaf">
+                      <img src="leafimg.png" alt="Leaf">
+                      <div>Leaf</div>
+                    </div>
+                    <div class="design-option" data-design="house">
+                      <img src="houseimg.png" alt="House">
+                      <div>House</div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="checkbox-group" id="customTextOption">
+                      <input type="checkbox" id="addCustomText" name="addCustomText">
+                      <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
+                    </div>
+                    <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden" style="margin-top: 16px;">
+                  </div>
+                </div>
+
+                <div id="customSection" class="hidden">
+                  <div class="form-group">
+                    <label>Describe Your Custom Design</label>
+                    <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Upload Reference Image (Optional)</label>
+                    <div class="file-upload">
+                      <input type="file" id="customFile" name="customFile" accept="image/*">
+                      <label for="customFile" class="file-upload-label">
+                        <span>Click to upload or drag and drop</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Quantity</label>
+                  <input type="number" id="quantity" name="quantity" value="1" min="1">
+                </div>
+
+                <div class="form-group">
+                  <label>NFC Link URL</label>
+                  <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
+                </div>
+
+                <div class="form-group">
+                  <label for="emailAddress">Your Email Address</label>
+                  <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required>
+                </div>
+
+                <div class="customizer-section hidden" id="customizerSection">
+                  <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
+                  
+                  <div id="viewer">
+                    <div class="viewer-placeholder">
+                      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="60" r="40" fill="#808080" opacity="0.8"/>
+                        <circle cx="100" cy="100" r="45" fill="#a0a0a0" opacity="0.8"/>
+                        <circle cx="100" cy="140" r="50" fill="#c0c0c0" opacity="0.8"/>
+                        <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  <div class="color-controls" id="colorControls">
+                    </div>
+                  
+                  <div class="glow-disclaimer" id="glowDisclaimer">
+                    Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
+                  </div>
+                  
+                  <p class="color-disclaimer">
+                    Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
+                  </p>
+                </div>
+
+                <div class="price-summary">
+                  <div class="price-row" id="basePrice" style="display: none;">
+                    <span>Base Fee</span>
+                    <span>$500</span>
+                  </div>
+                  <div class="price-row" id="unitPrice">
+                    <span>Unit Price</span>
+                    <span>$10</span>
+                  </div>
+                  <div class="price-row" id="quantityRow">
+                    <span>Quantity</span>
+                    <span>1</span>
+                  </div>
+                  <div class="price-row" id="customTextPrice" style="display: none;">
+                    <span>Custom Text</span>
+                    <span>$50</span>
+                  </div>
+                  <div class="price-row total">
+                    <span>Total</span>
+                    <span id="totalPrice">$10</span>
+                  </div>
+                </div>
             </div>
 
-            <div class="price-summary">
-              <div class="price-row" id="basePrice" style="display: none;">
-                <span>Base Fee</span>
-                <span>$500</span>
-              </div>
-              <div class="price-row" id="unitPrice">
-                <span>Unit Price</span>
-                <span>$10</span>
-              </div>
-              <div class="price-row" id="quantityRow">
-                <span>Quantity</span>
-                <span>1</span>
-              </div>
-              <div class="price-row" id="customTextPrice" style="display: none;">
-                <span>Custom Text</span>
-                <span>$50</span>
-              </div>
-              <div class="price-row total">
-                <span>Total</span>
-                <span id="totalPrice">$10</span>
-              </div>
+            <div id="payment-section" class="hidden">
+                <h2 class="section-title">Payment Details</h2>
+                <div id="payment-element">
+                  </div>
+                <button type="submit" id="submit-payment" class="order-button" style="margin-top: 20px;">
+                    <span id="button-text">Pay Now</span>
+                </button>
+                <div id="payment-message" class="hidden"></div>
             </div>
 
-            <button type="submit" class="order-button">Place Order</button>
+            <button type="button" id="continue-to-payment" class="order-button">Continue to Payment</button>
         </form>
       </div>
     </div>
@@ -902,35 +926,12 @@
       bottom: { name: 'Gold', hex: '#FFD700' },
       middle: { name: 'Teal', hex: '#008B8B' },
       top: { name: 'Shiny Purple', hex: '#9370DB' },
-      extra: { name: 'Red', hex: '#CC0000' } // Default for the 4th layer
+      extra: { name: 'Red', hex: '#CC0000' }
     };
 
-    // Pricing structure
-    const pricing = {
-      premade: [
-        { max: 9, price: 10 },
-        { max: 49, price: 8 },
-        { max: 99, price: 7 },
-        { max: Infinity, price: 5 }
-      ],
-      custom: [
-        { max: 9, price: 9 },
-        { max: 49, price: 7 },
-        { max: 99, price: 6 },
-        { max: Infinity, price: 4 }
-      ]
-    };
+    const pricing = { premade: [ { max: 9, price: 10 }, { max: 49, price: 8 }, { max: 99, price: 7 }, { max: Infinity, price: 5 } ], custom: [ { max: 9, price: 9 }, { max: 49, price: 7 }, { max: 99, price: 6 }, { max: Infinity, price: 4 } ] };
+    let state = { type: null, design: null, quantity: 1, customText: false, baseFee: 0 };
 
-    // State
-    let state = {
-      type: null,
-      design: null,
-      quantity: 1,
-      customText: false,
-      baseFee: 0
-    };
-
-    // DOM elements
     const typeOptions = document.querySelectorAll('.type-option');
     const premadeSection = document.getElementById('premadeSection');
     const customSection = document.getElementById('customSection');
@@ -944,27 +945,21 @@
     const fileLabel = document.querySelector('.file-upload-label span');
     const colorControlsContainer = document.getElementById('colorControls');
 
-
-    // Event listeners
     typeOptions.forEach(option => {
       option.addEventListener('click', () => {
         typeOptions.forEach(opt => opt.classList.remove('selected'));
         option.classList.add('selected');
-        
         state.type = option.dataset.type;
         state.baseFee = state.type === 'custom' ? 500 : 0;
-        
         if (state.type === 'premade') {
           premadeSection.classList.remove('hidden');
           customSection.classList.add('hidden');
           if(state.design) customizerSection.classList.remove('hidden');
-
         } else {
           premadeSection.classList.add('hidden');
           customSection.classList.remove('hidden');
           customizerSection.classList.add('hidden');
         }
-        
         updatePrice();
       });
     });
@@ -974,298 +969,93 @@
         designOptions.forEach(opt => opt.classList.remove('selected'));
         option.classList.add('selected');
         state.design = option.dataset.design;
-        
         setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
       });
     });
 
-    quantityInput.addEventListener('input', (e) => {
-      state.quantity = parseInt(e.target.value) || 1;
-      updatePrice();
-    });
+    quantityInput.addEventListener('input', (e) => { state.quantity = parseInt(e.target.value) || 1; updatePrice(); });
+    customTextOption.addEventListener('click', () => { state.customText = !state.customText; customTextCheckbox.checked = state.customText; customTextOption.classList.toggle('checked', state.customText); customTextInput.classList.toggle('hidden', !state.customText); updatePrice(); });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) { fileLabel.textContent = e.target.files[0].name; } });
 
-    customTextOption.addEventListener('click', () => {
-      state.customText = !state.customText;
-      customTextCheckbox.checked = state.customText;
-      customTextOption.classList.toggle('checked', state.customText);
-      customTextInput.classList.toggle('hidden', !state.customText);
-      updatePrice();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        fileLabel.textContent = e.target.files[0].name;
-      }
-    });
-
-    function getUnitPrice() {
-      if (!state.type) return 10;
-      
-      const priceList = pricing[state.type];
-      for (let tier of priceList) {
-        if (state.quantity <= tier.max) {
-          return tier.price;
-        }
-      }
-    }
-
-    function updatePrice() {
-      const unitPrice = getUnitPrice();
-      const customTextFee = state.customText ? 50 : 0;
-      const total = state.baseFee + (unitPrice * state.quantity) + customTextFee;
-      
-      document.getElementById('basePrice').style.display = state.baseFee > 0 ? 'flex' : 'none';
-      document.getElementById('unitPrice').querySelector('span:last-child').textContent = `$${unitPrice}`;
-      document.getElementById('quantityRow').querySelector('span:last-child').textContent = state.quantity;
-      document.getElementById('customTextPrice').style.display = state.customText ? 'flex' : 'none';
-      document.getElementById('totalPrice').textContent = `$${total}`;
-    }
+    function getUnitPrice() { if (!state.type) return 10; const priceList = pricing[state.type]; for (let tier of priceList) { if (state.quantity <= tier.max) { return tier.price; } } }
+    function updatePrice() { const unitPrice = getUnitPrice(); const customTextFee = state.customText ? 50 : 0; const total = state.baseFee + (unitPrice * state.quantity) + customTextFee; document.getElementById('basePrice').style.display = state.baseFee > 0 ? 'flex' : 'none'; document.getElementById('unitPrice').querySelector('span:last-child').textContent = `$${unitPrice}`; document.getElementById('quantityRow').querySelector('span:last-child').textContent = state.quantity; document.getElementById('customTextPrice').style.display = state.customText ? 'flex' : 'none'; document.getElementById('totalPrice').textContent = `$${total}`; }
     
-    function setupColorControls(design) {
-        const config = designLayers[design] || designLayers.default;
-        colorControlsContainer.innerHTML = ''; 
+    function setupColorControls(design) { const config = designLayers[design] || designLayers.default; colorControlsContainer.innerHTML = ''; config.layers.forEach((layerKey, index) => { const label = config.labels[index]; const control = createColorControlElement(layerKey, label); colorControlsContainer.appendChild(control); }); updateGlowDisclaimer(); }
+    function createColorControlElement(layerKey, label) { const color = selectedColors[layerKey]; const controlDiv = document.createElement('div'); controlDiv.className = 'color-control'; controlDiv.innerHTML = `<div class="color-control-header" data-layer="${layerKey}"><h4>${label}</h4><div class="selected-color"><span id="${layerKey}ColorName">${color.name}</span><div class="color-preview" id="${layerKey}ColorPreview" style="background: ${color.hex};"></div></div></div><div class="color-grid" id="${layerKey}ColorGrid"></div>`; const grid = controlDiv.querySelector(`#${layerKey}ColorGrid`); colorOptions.forEach(opt => { const colorOption = createColorOptionElement(opt, layerKey); if (opt.name === color.name) { colorOption.classList.add('selected'); } grid.appendChild(colorOption); }); const header = controlDiv.querySelector('.color-control-header'); header.addEventListener('click', () => grid.classList.toggle('expanded')); return controlDiv; }
+    function createColorOptionElement(color, layerKey) { const optionDiv = document.createElement('div'); optionDiv.className = 'color-option'; optionDiv.dataset.colorName = color.name; optionDiv.dataset.colorHex = color.hex; optionDiv.dataset.isGlow = color.isGlow || false; optionDiv.innerHTML = `<div class="color-swatch" style="background: ${color.hex};"></div><span class="color-name">${color.name}</span>`; optionDiv.addEventListener('click', () => selectColor(layerKey, color)); return optionDiv; }
+    function selectColor(layerKey, color) { selectedColors[layerKey] = color; document.getElementById(`${layerKey}ColorName`).textContent = color.name; document.getElementById(`${layerKey}ColorPreview`).style.background = color.hex; const grid = document.getElementById(`${layerKey}ColorGrid`); grid.querySelectorAll('.color-option').forEach(opt => { opt.classList.toggle('selected', opt.dataset.colorName === color.name); }); if (viewer3D && viewer3D.materials && viewer3D.materials[layerKey]) { viewer3D.materials[layerKey].color.set(color.hex); } updateGlowDisclaimer(); grid.classList.remove('expanded'); }
+    function updateGlowDisclaimer() { const hasGlow = Object.values(selectedColors).some(color => color.isGlow); document.getElementById('glowDisclaimer').classList.toggle('visible', hasGlow); }
 
-        config.layers.forEach((layerKey, index) => {
-            const label = config.labels[index];
-            const control = createColorControlElement(layerKey, label);
-            colorControlsContainer.appendChild(control);
-        });
-        
-        updateGlowDisclaimer();
-    }
-    
-    function createColorControlElement(layerKey, label) {
-        const color = selectedColors[layerKey];
-
-        const controlDiv = document.createElement('div');
-        controlDiv.className = 'color-control';
-        controlDiv.innerHTML = `
-            <div class="color-control-header" data-layer="${layerKey}">
-                <h4>${label}</h4>
-                <div class="selected-color">
-                    <span id="${layerKey}ColorName">${color.name}</span>
-                    <div class="color-preview" id="${layerKey}ColorPreview" style="background: ${color.hex};"></div>
-                </div>
-            </div>
-            <div class="color-grid" id="${layerKey}ColorGrid"></div>
-        `;
-
-        const grid = controlDiv.querySelector(`#${layerKey}ColorGrid`);
-        colorOptions.forEach(opt => {
-            const colorOption = createColorOptionElement(opt, layerKey);
-            if (opt.name === color.name) {
-                colorOption.classList.add('selected');
-            }
-            grid.appendChild(colorOption);
-        });
-
-        const header = controlDiv.querySelector('.color-control-header');
-        header.addEventListener('click', () => grid.classList.toggle('expanded'));
-
-        return controlDiv;
-    }
-    
-    function createColorOptionElement(color, layerKey) {
-        const optionDiv = document.createElement('div');
-        optionDiv.className = 'color-option';
-        optionDiv.dataset.colorName = color.name;
-        optionDiv.dataset.colorHex = color.hex;
-        optionDiv.dataset.isGlow = color.isGlow || false;
-        
-        optionDiv.innerHTML = `
-            <div class="color-swatch" style="background: ${color.hex};"></div>
-            <span class="color-name">${color.name}</span>
-        `;
-        
-        optionDiv.addEventListener('click', () => selectColor(layerKey, color));
-        return optionDiv;
-    }
-
-    function selectColor(layerKey, color) {
-      selectedColors[layerKey] = color;
-      
-      document.getElementById(`${layerKey}ColorName`).textContent = color.name;
-      document.getElementById(`${layerKey}ColorPreview`).style.background = color.hex;
-      
-      const grid = document.getElementById(`${layerKey}ColorGrid`);
-      grid.querySelectorAll('.color-option').forEach(opt => {
-        opt.classList.toggle('selected', opt.dataset.colorName === color.name);
-      });
-      
-      if (viewer3D && viewer3D.materials && viewer3D.materials[layerKey]) {
-        viewer3D.materials[layerKey].color.set(color.hex);
-      }
-      
-      updateGlowDisclaimer();
-      grid.classList.remove('expanded');
-    }
-
-    function updateGlowDisclaimer() {
-      const hasGlow = Object.values(selectedColors).some(color => color.isGlow);
-      document.getElementById('glowDisclaimer').classList.toggle('visible', hasGlow);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const videoToggle = document.getElementById('video-toggle');
-        const videoContainer = document.getElementById('video-container');
-        videoToggle.addEventListener('click', () => {
-            const isExpanded = videoContainer.classList.toggle('expanded');
-            videoToggle.textContent = isExpanded ? 'Hide Video Examples ▲' : 'Show Video Examples ▼';
-        });
-    });
+    document.addEventListener('DOMContentLoaded', () => { const videoToggle = document.getElementById('video-toggle'); const videoContainer = document.getElementById('video-container'); videoToggle.addEventListener('click', () => { const isExpanded = videoContainer.classList.toggle('expanded'); videoToggle.textContent = isExpanded ? 'Hide Video Examples ▲' : 'Show Video Examples ▼'; }); });
 
     let viewer3D = null;
-    
-    function init3DViewer() {
-      if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') {
-        setTimeout(init3DViewer, 100);
-        return;
-      }
+    function init3DViewer() { if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') { setTimeout(init3DViewer, 100); return; } const container = document.getElementById('viewer'); container.innerHTML = ''; if (viewer3D && viewer3D.renderer) { viewer3D.renderer.dispose(); } try { const scene = new THREE.Scene(); scene.background = new THREE.Color(0xf5f5f7); const group = new THREE.Group(); scene.add(group); const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000); camera.position.set(0, 0, 100); camera.lookAt(group.position); const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setSize(container.clientWidth, container.clientHeight); renderer.shadowMap.enabled = true; container.appendChild(renderer.domElement); const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.05; controls.screenSpacePanning = false; controls.minDistance = 30; controls.maxDistance = 200; controls.autoRotate = true; controls.autoRotateSpeed = 1.0; const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight); const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); directionalLight.position.set(10, 10, 5); directionalLight.castShadow = true; scene.add(directionalLight); const currentDesignConfig = designLayers[state.design] || designLayers.default; const layersToRender = currentDesignConfig.layers; const spacing = currentDesignConfig.spacing; const materials = {}; layersToRender.forEach(layerKey => { materials[layerKey] = new THREE.MeshPhongMaterial({ color: selectedColors[layerKey].hex, specular: 0x222222, shininess: 100 }); }); const placeholderMeshes = createPlaceholders(group, materials, layersToRender, spacing); if (typeof THREE.STLLoader !== 'undefined') { const loader = new THREE.STLLoader(); const design = state.design; layersToRender.forEach((layerKey, index) => { const filename = `${design}-${layerKey}.stl`; loader.load(filename, (geometry) => { if(placeholderMeshes[index]) group.remove(placeholderMeshes[index]); geometry.computeBoundingBox(); const bbox = geometry.boundingBox; const center = new THREE.Vector3(); bbox.getCenter(center); geometry.translate(-center.x, -center.y, -center.z); const mesh = new THREE.Mesh(geometry, materials[layerKey]); const offset = (layersToRender.length - 1) / 2.0; mesh.position.z = (index - offset) * spacing; mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = layerKey; group.add(mesh); const size = new THREE.Vector3(); new THREE.Box3().setFromObject(group).getSize(size); const maxDim = Math.max(size.x, size.y, size.z); camera.position.z = maxDim * 1.8; }, undefined, () => { console.warn(`Could not load ${filename}, using placeholder`); }); }); } viewer3D = { scene, camera, renderer, materials, group }; function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); } animate(); window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); }); } catch (error) { console.error('Error initializing 3D viewer:', error); } }
+    function createPlaceholders(group, materials, layers, spacing) { const meshes = []; const geometries = [ new THREE.CylinderGeometry(25, 25, 5, 32), new THREE.CylinderGeometry(23, 23, 5, 32), new THREE.CylinderGeometry(21, 21, 5, 32), new THREE.CylinderGeometry(19, 19, 5, 32) ]; const offset = (layers.length - 1) / 2.0; layers.forEach((layerKey, index) => { const mesh = new THREE.Mesh(geometries[index], materials[layerKey]); mesh.position.z = (index - offset) * spacing; mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = layerKey + '_placeholder'; group.add(mesh); meshes.push(mesh); }); return meshes; }
 
-      const container = document.getElementById('viewer');
-      container.innerHTML = '';
-      if (viewer3D && viewer3D.renderer) {
-        viewer3D.renderer.dispose();
-      }
-      
-      try {
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xf5f5f7);
+    // --- STRIPE PAYMENT LOGIC ---
+    // PASTE YOUR STRIPE PUBLISHABLE KEY HERE
+    const stripe = Stripe('pk_test_51Rmh2lA2ORZxLqWg8rgbL4DDcBTLRj1VrSRrntLz6A3U52IIOwKLIi8hoKChpxbpcEV2Lb9uGfpcawYQOPI8k0c7007cAC22E3'); 
+    let elements;
 
-        const group = new THREE.Group();
-        scene.add(group);
+    document.getElementById('continue-to-payment').addEventListener('click', async () => {
+        // Hide the main form and the 'Continue' button
+        document.getElementById('main-form-content').classList.add('hidden');
+        document.getElementById('continue-to-payment').classList.add('hidden');
+        document.getElementById('payment-section').classList.remove('hidden');
 
-        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 0, 100);
-        camera.lookAt(group.position);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.shadowMap.enabled = true;
-        container.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.screenSpacePanning = false;
-        controls.minDistance = 30;
-        controls.maxDistance = 200;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 1.0;
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(10, 10, 5);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
-        
-        const currentDesignConfig = designLayers[state.design] || designLayers.default;
-        const layersToRender = currentDesignConfig.layers;
-        const spacing = currentDesignConfig.spacing;
-
-        const materials = {};
-        layersToRender.forEach(layerKey => {
-            materials[layerKey] = new THREE.MeshPhongMaterial({ color: selectedColors[layerKey].hex, specular: 0x222222, shininess: 100 });
+        // Fetch the client secret from your Vercel serverless function
+        const response = await fetch('/api/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: parseFloat(document.getElementById('totalPrice').textContent.replace('$', '')) * 100
+            })
         });
 
-        const placeholderMeshes = createPlaceholders(group, materials, layersToRender, spacing);
+        const { clientSecret } = await response.json();
 
-        if (typeof THREE.STLLoader !== 'undefined') {
-          const loader = new THREE.STLLoader();
-          const design = state.design;
-          
-          layersToRender.forEach((layerKey, index) => {
-            const filename = `${design}-${layerKey}.stl`;
-            loader.load(filename, (geometry) => {
-              if(placeholderMeshes[index]) group.remove(placeholderMeshes[index]);
-              
-              geometry.computeBoundingBox();
-              const bbox = geometry.boundingBox;
-              const center = new THREE.Vector3();
-              bbox.getCenter(center);
-              geometry.translate(-center.x, -center.y, -center.z);
-              
-              const mesh = new THREE.Mesh(geometry, materials[layerKey]);
-              
-              const offset = (layersToRender.length - 1) / 2.0;
-              mesh.position.z = (index - offset) * spacing;
-              
-              mesh.castShadow = true;
-              mesh.receiveShadow = true;
-              mesh.name = layerKey;
-              group.add(mesh);
-
-              const size = new THREE.Vector3();
-              new THREE.Box3().setFromObject(group).getSize(size);
-              const maxDim = Math.max(size.x, size.y, size.z);
-              camera.position.z = maxDim * 1.8;
-
-            }, undefined, () => {
-              console.warn(`Could not load ${filename}, using placeholder`);
-            });
-          });
-        }
-        
-        viewer3D = { scene, camera, renderer, materials, group };
-        
-        function animate() {
-          requestAnimationFrame(animate);
-          controls.update();
-          renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-          camera.aspect = container.clientWidth / container.clientHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-
-      } catch (error) {
-        console.error('Error initializing 3D viewer:', error);
-      }
-    }
-
-    function createPlaceholders(group, materials, layers, spacing) {
-      const meshes = [];
-      const geometries = [
-        new THREE.CylinderGeometry(25, 25, 5, 32),
-        new THREE.CylinderGeometry(23, 23, 5, 32),
-        new THREE.CylinderGeometry(21, 21, 5, 32),
-        new THREE.CylinderGeometry(19, 19, 5, 32)
-      ];
-      
-      const offset = (layers.length - 1) / 2.0;
-      layers.forEach((layerKey, index) => {
-        const mesh = new THREE.Mesh(geometries[index], materials[layerKey]);
-        mesh.position.z = (index - offset) * spacing;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        mesh.name = layerKey + '_placeholder';
-        group.add(mesh);
-        meshes.push(mesh);
-      });
-      return meshes;
-    }
-
-    document.getElementById('orderForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const formData = {
-        type: state.type,
-        design: state.design,
-        quantity: state.quantity,
-        customText: state.customText ? customTextInput.value : null,
-        nfcUrl: document.getElementById('nfcUrl').value,
-        totalPrice: document.getElementById('totalPrice').textContent,
-        colors: state.type === 'premade' ? selectedColors : null
-      };
-      console.log('Order submitted:', formData);
-      alert('Order form is ready! Form data logged to console.');
+        elements = stripe.elements({ clientSecret });
+        const paymentElement = elements.create("payment");
+        paymentElement.mount("#payment-element");
     });
+
+    // The main form's submit event is now handled by the 'Pay Now' button
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Only proceed if Stripe elements are ready
+        if (!elements) {
+            return;
+        }
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                // Change this to your actual success page URL
+                return_url: `${window.location.origin}/success.html`,
+            },
+        });
+
+        // This point will only be reached if there is an immediate error when
+        // confirming the payment. Otherwise, your customer will be redirected.
+        if (error.type === "card_error" || error.type === "validation_error") {
+            showMessage(error.message);
+        } else {
+            showMessage("An unexpected error occurred.");
+        }
+    });
+
+    function showMessage(messageText) {
+        const messageContainer = document.querySelector("#payment-message");
+        messageContainer.classList.remove("hidden");
+        messageContainer.textContent = messageText;
+        setTimeout(() => {
+            messageContainer.classList.add("hidden");
+            messageContainer.textContent = "";
+        }, 5000);
+    }
   </script>
 </body>
 </html>
