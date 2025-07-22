@@ -557,10 +557,14 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
+    
+    .order-button:disabled {
+        background: #86868b;
+        cursor: not-allowed;
+    }
 
     .order-button:hover {
       background: #0051d5;
-      transform: translateY(-1px);
     }
 
     .hidden {
@@ -571,17 +575,6 @@
       font-size: 28px;
       font-weight: 600;
       margin-bottom: 24px;
-    }
-    
-    #payment-section {
-        margin-top: 40px;
-    }
-    
-    #payment-message {
-        text-align: center;
-        margin-top: 20px;
-        font-weight: 500;
-        color: #d92d20;
     }
   </style>
 
@@ -713,174 +706,162 @@
     <div class="container">
       <div id="order-section" class="selection-section">
         <form id="orderForm">
-            <div id="main-form-content">
-                <div class="hero">
-                    <h1>Order Your QuantumID</h1>
-                    <p>Premium NFC-enabled tokens, crafted to perfection</p>
+            <div class="hero">
+                <h1>Order Your QuantumID</h1>
+                <p>Premium NFC-enabled tokens, crafted to perfection</p>
+            </div>
+          
+            <h2 class="section-title">Choose Your Token Type</h2>
+            
+            <div class="token-type-selector">
+              <div class="type-option" data-type="premade">
+                <h3>Premade Designs</h3>
+                <p>Choose from our curated collection</p>
+                <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">Starting at $10</p>
+              </div>
+              <div class="type-option" data-type="custom">
+                <h3>Custom Design</h3>
+                <p>Create your unique token</p>
+                <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">$500 base + unit price</p>
+              </div>
+            </div>
+
+            <div id="premadeSection" class="hidden">
+              <h3 style="margin-bottom: 24px;">Select a Design</h3>
+              <div class="design-grid">
+                <div class="design-option" data-design="wine">
+                  <img src="wineimg.png" alt="Wine Glass">
+                  <div>Wine Glass</div>
+                </div>
+                <div class="design-option" data-design="heel">
+                  <img src="heelimg.png" alt="High Heel">
+                  <div>High Heel</div>
+                </div>
+                <div class="design-option" data-design="tire">
+                  <img src="tireimg.png" alt="Tire">
+                  <div>Tire</div>
+                </div>
+                <div class="design-option" data-design="star">
+                  <img src="starimg.png" alt="Star">
+                  <div>Star</div>
+                </div>
+                <div class="design-option" data-design="crown">
+                  <img src="crownimg.png" alt="Crown">
+                  <div>Crown</div>
+                </div>
+                <div class="design-option" data-design="lips">
+                  <img src="lipsimg.png" alt="Lips">
+                  <div>Lips</div>
+                </div>
+                <div class="design-option" data-design="mic">
+                  <img src="micimg.png" alt="Microphone">
+                  <div>Microphone</div>
+                </div>
+                <div class="design-option" data-design="book">
+                  <img src="bookimg.png" alt="Book">
+                  <div>Book</div>
+                </div>
+                <div class="design-option" data-design="leaf">
+                  <img src="leafimg.png" alt="Leaf">
+                  <div>Leaf</div>
+                </div>
+                <div class="design-option" data-design="house">
+                  <img src="houseimg.png" alt="House">
+                  <div>House</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="checkbox-group" id="customTextOption">
+                  <input type="checkbox" id="addCustomText" name="addCustomText">
+                  <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
+                </div>
+                <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden" style="margin-top: 16px;">
+              </div>
+            </div>
+
+            <div id="customSection" class="hidden">
+              <div class="form-group">
+                <label>Describe Your Custom Design</label>
+                <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Upload Reference Image (Optional)</label>
+                <div class="file-upload">
+                  <input type="file" id="customFile" name="customFile" accept="image/*">
+                  <label for="customFile" class="file-upload-label">
+                    <span>Click to upload or drag and drop</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="number" id="quantity" name="quantity" value="1" min="1">
+            </div>
+
+            <div class="form-group">
+              <label>NFC Link URL</label>
+              <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+              <label for="emailAddress">Your Email Address</label>
+              <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required>
+            </div>
+
+            <div class="customizer-section hidden" id="customizerSection">
+              <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
+              
+              <div id="viewer">
+                <div class="viewer-placeholder">
+                  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="60" r="40" fill="#808080" opacity="0.8"/>
+                    <circle cx="100" cy="100" r="45" fill="#a0a0a0" opacity="0.8"/>
+                    <circle cx="100" cy="140" r="50" fill="#c0c0c0" opacity="0.8"/>
+                    <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
+                  </svg>
+                </div>
+              </div>
+              
+              <div class="color-controls" id="colorControls">
                 </div>
               
-                <h2 class="section-title">Choose Your Token Type</h2>
-                
-                <div class="token-type-selector">
-                  <div class="type-option" data-type="premade">
-                    <h3>Premade Designs</h3>
-                    <p>Choose from our curated collection</p>
-                    <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">Starting at $10</p>
-                  </div>
-                  <div class="type-option" data-type="custom">
-                    <h3>Custom Design</h3>
-                    <p>Create your unique token</p>
-                    <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">$500 base + unit price</p>
-                  </div>
-                </div>
-
-                <div id="premadeSection" class="hidden">
-                  <h3 style="margin-bottom: 24px;">Select a Design</h3>
-                  <div class="design-grid">
-                    <div class="design-option" data-design="wine">
-                      <img src="wineimg.png" alt="Wine Glass">
-                      <div>Wine Glass</div>
-                    </div>
-                    <div class="design-option" data-design="heel">
-                      <img src="heelimg.png" alt="High Heel">
-                      <div>High Heel</div>
-                    </div>
-                    <div class="design-option" data-design="tire">
-                      <img src="tireimg.png" alt="Tire">
-                      <div>Tire</div>
-                    </div>
-                    <div class="design-option" data-design="star">
-                      <img src="starimg.png" alt="Star">
-                      <div>Star</div>
-                    </div>
-                    <div class="design-option" data-design="crown">
-                      <img src="crownimg.png" alt="Crown">
-                      <div>Crown</div>
-                    </div>
-                    <div class="design-option" data-design="lips">
-                      <img src="lipsimg.png" alt="Lips">
-                      <div>Lips</div>
-                    </div>
-                    <div class="design-option" data-design="mic">
-                      <img src="micimg.png" alt="Microphone">
-                      <div>Microphone</div>
-                    </div>
-                    <div class="design-option" data-design="book">
-                      <img src="bookimg.png" alt="Book">
-                      <div>Book</div>
-                    </div>
-                    <div class="design-option" data-design="leaf">
-                      <img src="leafimg.png" alt="Leaf">
-                      <div>Leaf</div>
-                    </div>
-                    <div class="design-option" data-design="house">
-                      <img src="houseimg.png" alt="House">
-                      <div>House</div>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <div class="checkbox-group" id="customTextOption">
-                      <input type="checkbox" id="addCustomText" name="addCustomText">
-                      <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
-                    </div>
-                    <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden" style="margin-top: 16px;">
-                  </div>
-                </div>
-
-                <div id="customSection" class="hidden">
-                  <div class="form-group">
-                    <label>Describe Your Custom Design</label>
-                    <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
-                  </div>
-
-                  <div class="form-group">
-                    <label>Upload Reference Image (Optional)</label>
-                    <div class="file-upload">
-                      <input type="file" id="customFile" name="customFile" accept="image/*">
-                      <label for="customFile" class="file-upload-label">
-                        <span>Click to upload or drag and drop</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Quantity</label>
-                  <input type="number" id="quantity" name="quantity" value="1" min="1">
-                </div>
-
-                <div class="form-group">
-                  <label>NFC Link URL</label>
-                  <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
-                </div>
-
-                <div class="form-group">
-                  <label for="emailAddress">Your Email Address</label>
-                  <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required>
-                </div>
-
-                <div class="customizer-section hidden" id="customizerSection">
-                  <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
-                  
-                  <div id="viewer">
-                    <div class="viewer-placeholder">
-                      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="100" cy="60" r="40" fill="#808080" opacity="0.8"/>
-                        <circle cx="100" cy="100" r="45" fill="#a0a0a0" opacity="0.8"/>
-                        <circle cx="100" cy="140" r="50" fill="#c0c0c0" opacity="0.8"/>
-                        <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
-                      </svg>
-                    </div>
-                  </div>
-                  
-                  <div class="color-controls" id="colorControls">
-                    </div>
-                  
-                  <div class="glow-disclaimer" id="glowDisclaimer">
-                    Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
-                  </div>
-                  
-                  <p class="color-disclaimer">
-                    Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
-                  </p>
-                </div>
-
-                <div class="price-summary">
-                  <div class="price-row" id="basePrice" style="display: none;">
-                    <span>Base Fee</span>
-                    <span>$500</span>
-                  </div>
-                  <div class="price-row" id="unitPrice">
-                    <span>Unit Price</span>
-                    <span>$10</span>
-                  </div>
-                  <div class="price-row" id="quantityRow">
-                    <span>Quantity</span>
-                    <span>1</span>
-                  </div>
-                  <div class="price-row" id="customTextPrice" style="display: none;">
-                    <span>Custom Text</span>
-                    <span>$50</span>
-                  </div>
-                  <div class="price-row total">
-                    <span>Total</span>
-                    <span id="totalPrice">$10</span>
-                  </div>
-                </div>
+              <div class="glow-disclaimer" id="glowDisclaimer">
+                Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
+              </div>
+              
+              <p class="color-disclaimer">
+                Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
+              </p>
             </div>
 
-            <div id="payment-section" class="hidden">
-                <h2 class="section-title">Payment Details</h2>
-                <div id="payment-element">
-                  </div>
-                <button type="submit" id="submit-payment" class="order-button" style="margin-top: 20px;">
-                    <span id="button-text">Pay Now</span>
-                </button>
-                <div id="payment-message" class="hidden"></div>
+            <div class="price-summary">
+              <div class="price-row" id="basePrice" style="display: none;">
+                <span>Base Fee</span>
+                <span>$500</span>
+              </div>
+              <div class="price-row" id="unitPrice">
+                <span>Unit Price</span>
+                <span>$10</span>
+              </div>
+              <div class="price-row" id="quantityRow">
+                <span>Quantity</span>
+                <span>1</span>
+              </div>
+              <div class="price-row" id="customTextPrice" style="display: none;">
+                <span>Custom Text</span>
+                <span>$50</span>
+              </div>
+              <div class="price-row total">
+                <span>Total</span>
+                <span id="totalPrice">$10</span>
+              </div>
             </div>
 
-            <button type="button" id="continue-to-payment" class="order-button">Continue to Payment</button>
+            <button type="submit" id="order-button" class="order-button">Proceed to Checkout</button>
         </form>
       </div>
     </div>
@@ -994,60 +975,44 @@
     function init3DViewer() { if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') { setTimeout(init3DViewer, 100); return; } const container = document.getElementById('viewer'); container.innerHTML = ''; if (viewer3D && viewer3D.renderer) { viewer3D.renderer.dispose(); } try { const scene = new THREE.Scene(); scene.background = new THREE.Color(0xf5f5f7); const group = new THREE.Group(); scene.add(group); const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000); camera.position.set(0, 0, 100); camera.lookAt(group.position); const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setSize(container.clientWidth, container.clientHeight); renderer.shadowMap.enabled = true; container.appendChild(renderer.domElement); const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.05; controls.screenSpacePanning = false; controls.minDistance = 30; controls.maxDistance = 200; controls.autoRotate = true; controls.autoRotateSpeed = 1.0; const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight); const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); directionalLight.position.set(10, 10, 5); directionalLight.castShadow = true; scene.add(directionalLight); const currentDesignConfig = designLayers[state.design] || designLayers.default; const layersToRender = currentDesignConfig.layers; const spacing = currentDesignConfig.spacing; const materials = {}; layersToRender.forEach(layerKey => { materials[layerKey] = new THREE.MeshPhongMaterial({ color: selectedColors[layerKey].hex, specular: 0x222222, shininess: 100 }); }); const placeholderMeshes = createPlaceholders(group, materials, layersToRender, spacing); if (typeof THREE.STLLoader !== 'undefined') { const loader = new THREE.STLLoader(); const design = state.design; layersToRender.forEach((layerKey, index) => { const filename = `${design}-${layerKey}.stl`; loader.load(filename, (geometry) => { if(placeholderMeshes[index]) group.remove(placeholderMeshes[index]); geometry.computeBoundingBox(); const bbox = geometry.boundingBox; const center = new THREE.Vector3(); bbox.getCenter(center); geometry.translate(-center.x, -center.y, -center.z); const mesh = new THREE.Mesh(geometry, materials[layerKey]); const offset = (layersToRender.length - 1) / 2.0; mesh.position.z = (index - offset) * spacing; mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = layerKey; group.add(mesh); const size = new THREE.Vector3(); new THREE.Box3().setFromObject(group).getSize(size); const maxDim = Math.max(size.x, size.y, size.z); camera.position.z = maxDim * 1.8; }, undefined, () => { console.warn(`Could not load ${filename}, using placeholder`); }); }); } viewer3D = { scene, camera, renderer, materials, group }; function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); } animate(); window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); }); } catch (error) { console.error('Error initializing 3D viewer:', error); } }
     function createPlaceholders(group, materials, layers, spacing) { const meshes = []; const geometries = [ new THREE.CylinderGeometry(25, 25, 5, 32), new THREE.CylinderGeometry(23, 23, 5, 32), new THREE.CylinderGeometry(21, 21, 5, 32), new THREE.CylinderGeometry(19, 19, 5, 32) ]; const offset = (layers.length - 1) / 2.0; layers.forEach((layerKey, index) => { const mesh = new THREE.Mesh(geometries[index], materials[layerKey]); mesh.position.z = (index - offset) * spacing; mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = layerKey + '_placeholder'; group.add(mesh); meshes.push(mesh); }); return meshes; }
 
-    // --- STRIPE PAYMENT LOGIC ---
+    // --- STRIPE CHECKOUT LOGIC ---
     // PASTE YOUR STRIPE PUBLISHABLE KEY HERE
     const stripe = Stripe('pk_test_51Rmh2lA2ORZxLqWg8rgbL4DDcBTLRj1VrSRrntLz6A3U52IIOwKLIi8hoKChpxbpcEV2Lb9uGfpcawYQOPI8k0c7007cAC22E3'); 
-    let elements;
-
-    document.getElementById('continue-to-payment').addEventListener('click', async () => {
-        document.getElementById('main-form-content').classList.add('hidden');
-        document.getElementById('continue-to-payment').classList.add('hidden');
-        document.getElementById('payment-section').classList.remove('hidden');
-
-        // Fetch the client secret from your Vercel serverless function
-        const response = await fetch('/api/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                amount: Math.round(parseFloat(document.getElementById('totalPrice').textContent.replace('$', '')) * 100)
-            })
-        });
-
-        const { clientSecret } = await response.json();
-
-        elements = stripe.elements({ clientSecret });
-        const paymentElement = elements.create("payment");
-        paymentElement.mount("#payment-element");
-    });
+    const orderButton = document.getElementById('order-button');
 
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        if (!elements) { return; }
+        orderButton.textContent = 'Processing...';
+        orderButton.disabled = true;
 
-        const { error } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-                return_url: `${window.location.origin}/success.html`,
-            },
+        const unitPrice = getUnitPrice();
+        const customTextFee = state.customText ? 50 : 0;
+        const baseFee = state.baseFee;
+        const quantity = state.quantity;
+        const totalInDollars = baseFee + (unitPrice * quantity) + customTextFee;
+        
+        const productName = state.type === 'custom' ? 'Custom QuantumID Order' : `QuantumID - ${state.design} Design`;
+
+        const response = await fetch('/api/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productName: productName,
+                quantity: 1, 
+                amount: Math.round(totalInDollars * 100)
+            })
         });
 
-        if (error.type === "card_error" || error.type === "validation_error") {
-            showMessage(error.message);
+        if (response.ok) {
+            const { url } = await response.json();
+            window.location.href = url;
         } else {
-            showMessage("An unexpected error occurred.");
+            console.error('Failed to create checkout session.');
+            alert('Could not proceed to payment. Please try again.');
+            orderButton.textContent = 'Proceed to Checkout';
+            orderButton.disabled = false;
         }
     });
-
-    function showMessage(messageText) {
-        const messageContainer = document.querySelector("#payment-message");
-        messageContainer.classList.remove("hidden");
-        messageContainer.textContent = messageText;
-        setTimeout(() => {
-            messageContainer.classList.add("hidden");
-            messageContainer.textContent = "";
-        }, 5000);
-    }
   </script>
 </body>
 </html>
