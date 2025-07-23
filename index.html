@@ -397,7 +397,7 @@
       background: #f5f5f7;
       border-radius: 12px;
       padding: 24px;
-      margin: 32px 0;
+      margin-top: 24px;
     }
 
     .color-controls {
@@ -587,6 +587,37 @@
       font-weight: 600;
       margin-bottom: 24px;
     }
+    
+    #cart-summary {
+        margin-top: 40px;
+    }
+
+    .cart-item {
+        background: #f5f5f7;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .cart-item-details p {
+        margin: 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .cart-item-remove {
+        background: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    
   </style>
 
   <style>
@@ -782,10 +813,41 @@
                 </div>
               </div>
 
+              <div class="customizer-section hidden" id="customizerSection">
+                <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
+                
+                <div id="viewer">
+                  <div class="viewer-placeholder">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="100" cy="60" r="40" fill="#808080" opacity="0.8"/>
+                      <circle cx="100" cy="100" r="45" fill="#a0a0a0" opacity="0.8"/>
+                      <circle cx="100" cy="140" r="50" fill="#c0c0c0" opacity="0.8"/>
+                      <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
+                    </svg>
+                  </div>
+                </div>
+                
+                <div class="color-controls" id="colorControls"></div>
+                
+                <div class="glow-disclaimer" id="glowDisclaimer">
+                  Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
+                </div>
+                
+                <p class="color-disclaimer">
+                  Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
+                </p>
+
+                <div class="form-group" style="margin-top: 24px;">
+                    <label for="item-quantity">Quantity for this Design</label>
+                    <input type="number" id="item-quantity" value="1" min="1" style="width: 100px; display: inline-block; margin-right: 16px;">
+                    <button type="button" id="add-to-order-btn" class="order-button" style="width: auto; display: inline-block; vertical-align: middle;">Add to Order</button>
+                </div>
+              </div>
+
               <div class="form-group">
                 <div class="checkbox-group" id="customTextOption">
                   <input type="checkbox" id="addCustomText" name="addCustomText">
-                  <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
+                  <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (for all items)</label>
                 </div>
                 <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden">
                 <div class="error-message hidden">Please provide your custom text.</div>
@@ -811,12 +873,6 @@
             </div>
 
             <div class="form-group">
-              <label>Quantity</label>
-              <input type="number" id="quantity" name="quantity" value="1" min="1" required>
-              <div class="error-message hidden">Please enter a valid quantity.</div>
-            </div>
-
-            <div class="form-group">
               <label>NFC Link URL</label>
               <input type="text" inputmode="url" pattern=".*\..+" id="nfcUrl" name="nfcUrl" placeholder="example.com" required>
               <div class="error-message hidden">Please enter a valid domain (e.g., example.com).</div>
@@ -828,52 +884,17 @@
               <div class="error-message hidden">Please enter a valid email address.</div>
             </div>
 
-            <div class="customizer-section hidden" id="customizerSection">
-              <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
-              
-              <div id="viewer">
-                <div class="viewer-placeholder">
-                  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="60" r="40" fill="#808080" opacity="0.8"/>
-                    <circle cx="100" cy="100" r="45" fill="#a0a0a0" opacity="0.8"/>
-                    <circle cx="100" cy="140" r="50" fill="#c0c0c0" opacity="0.8"/>
-                    <text x="100" y="180" text-anchor="middle" fill="#666" font-size="12">3D Preview</text>
-                  </svg>
+            <div id="cart-summary">
                 </div>
-              </div>
-              
-              <div class="color-controls" id="colorControls">
-                </div>
-              
-              <div class="glow-disclaimer" id="glowDisclaimer">
-                Note: Glow-in-the-dark colors will appear white in normal light and will only glow with the displayed color in darkness.
-              </div>
-              
-              <p class="color-disclaimer">
-                Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
-              </p>
-            </div>
 
             <div class="price-summary">
-              <div class="price-row" id="basePrice" style="display: none;">
-                <span>Base Fee</span>
-                <span>$500</span>
-              </div>
-              <div class="price-row" id="unitPrice">
-                <span>Unit Price</span>
-                <span>$10</span>
-              </div>
-              <div class="price-row" id="quantityRow">
-                <span>Quantity</span>
-                <span>1</span>
-              </div>
               <div class="price-row" id="customTextPrice" style="display: none;">
-                <span>Custom Text</span>
+                <span>Custom Text Fee</span>
                 <span>$50</span>
               </div>
               <div class="price-row total">
                 <span>Total</span>
-                <span id="totalPrice">$10</span>
+                <span id="totalPrice">$0</span>
               </div>
             </div>
 
@@ -887,36 +908,18 @@
   <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/STLLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script>
+    // --- STATE AND CONFIGURATION ---
+
+    let cart = []; // Shopping cart
+    
     // Layer and Color Configuration
     const designLayers = {
-        default: {
-            layers: ['bottom', 'middle', 'top'],
-            labels: ['Bottom Layer', 'Middle Layer', 'Top Layer'],
-            spacing: 2
-        },
-        lips: {
-            layers: ['bottom', 'middle', 'top', 'extra'],
-            labels: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4'],
-            spacing: 1.5
-        }
+        default: { layers: ['bottom', 'middle', 'top'], labels: ['Bottom Layer', 'Middle Layer', 'Top Layer'], spacing: 2 },
+        lips: { layers: ['bottom', 'middle', 'top', 'extra'], labels: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4'], spacing: 1.5 }
     };
     
     const colorOptions = [
-      { name: 'Glow in the Dark (Blue)', hex: '#E6F3FF', glowHex: '#0080FF', isGlow: true },
-      { name: 'Glow in the Dark (Green)', hex: '#E6FFE6', glowHex: '#00FF00', isGlow: true },
-      { name: 'Red', hex: '#CC0000' },
-      { name: 'Chameleon Red-Orange', hex: '#FF4500' },
-      { name: 'Chameleon Green-Blue', hex: '#006064' },
-      { name: 'Galaxy Purple', hex: '#4B0082' },
-      { name: 'Black', hex: '#000000' },
-      { name: 'White', hex: '#FFFFFF' },
-      { name: 'Gold', hex: '#FFD700' },
-      { name: 'Teal', hex: '#008B8B' },
-      { name: 'Dark Blue', hex: '#000080' },
-      { name: 'Neon Yellow', hex: '#FFFF00' },
-      { name: 'Shiny Emerald', hex: '#50C878' },
-      { name: 'Shiny Purple', hex: '#9370DB' },
-      { name: 'Green', hex: '#228B22' }
+      { name: 'Glow in the Dark (Blue)', hex: '#E6F3FF', glowHex: '#0080FF', isGlow: true }, { name: 'Glow in the Dark (Green)', hex: '#E6FFE6', glowHex: '#00FF00', isGlow: true }, { name: 'Red', hex: '#CC0000' }, { name: 'Chameleon Red-Orange', hex: '#FF4500' }, { name: 'Chameleon Green-Blue', hex: '#006064' }, { name: 'Galaxy Purple', hex: '#4B0082' }, { name: 'Black', hex: '#000000' }, { name: 'White', hex: '#FFFFFF' }, { name: 'Gold', hex: '#FFD700' }, { name: 'Teal', hex: '#008B8B' }, { name: 'Dark Blue', hex: '#000080' }, { name: 'Neon Yellow', hex: '#FFFF00' }, { name: 'Shiny Emerald', hex: '#50C878' }, { name: 'Shiny Purple', hex: '#9370DB' }, { name: 'Green', hex: '#228B22' }
     ];
 
     let selectedColors = {
@@ -927,21 +930,24 @@
     };
 
     const pricing = { premade: [ { max: 9, price: 10 }, { max: 49, price: 8 }, { max: 99, price: 7 }, { max: Infinity, price: 5 } ], custom: [ { max: 9, price: 9 }, { max: 49, price: 7 }, { max: 99, price: 6 }, { max: Infinity, price: 4 } ] };
-    let state = { type: null, design: null, quantity: 1, customText: false, baseFee: 0 };
+    let state = { type: null, design: null, customText: false, baseFee: 0 };
 
+    // --- DOM ELEMENTS ---
     const typeOptions = document.querySelectorAll('.type-option');
     const premadeSection = document.getElementById('premadeSection');
     const customSection = document.getElementById('customSection');
     const customizerSection = document.getElementById('customizerSection');
     const designOptions = document.querySelectorAll('.design-option');
-    const quantityInput = document.getElementById('quantity');
     const customTextCheckbox = document.getElementById('addCustomText');
     const customTextInput = document.getElementById('customText');
     const customTextOption = document.getElementById('customTextOption');
-    const fileInput = document.getElementById('customFile');
-    const fileLabel = document.querySelector('.file-upload-label span');
     const colorControlsContainer = document.getElementById('colorControls');
     const customDescription = document.querySelector('textarea[name="customDescription"]');
+    const addToOrderBtn = document.getElementById('add-to-order-btn');
+    const cartSummaryEl = document.getElementById('cart-summary');
+    const orderForm = document.getElementById('orderForm');
+
+    // --- EVENT LISTENERS ---
 
     typeOptions.forEach(option => {
       option.addEventListener('click', () => {
@@ -949,11 +955,13 @@
         option.classList.add('selected');
         state.type = option.dataset.type;
         state.baseFee = state.type === 'custom' ? 500 : 0;
+        
+        let targetSection;
         if (state.type === 'premade') {
           premadeSection.classList.remove('hidden');
           customSection.classList.add('hidden');
           customDescription.required = false;
-          if(state.design) customizerSection.classList.remove('hidden');
+          targetSection = premadeSection;
         } else {
           premadeSection.classList.add('hidden');
           customSection.classList.remove('hidden');
@@ -964,8 +972,10 @@
           customTextOption.classList.remove('checked');
           customTextInput.classList.add('hidden');
           customTextInput.required = false;
+          targetSection = customSection;
         }
-        updatePrice();
+        updateCartTotal();
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
 
@@ -977,10 +987,9 @@
         setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
+        customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
     });
-
-    quantityInput.addEventListener('input', (e) => { state.quantity = parseInt(e.target.value) || 1; updatePrice(); });
     
     customTextOption.addEventListener('click', () => { 
         state.customText = !state.customText; 
@@ -988,19 +997,130 @@
         customTextOption.classList.toggle('checked', state.customText); 
         customTextInput.classList.toggle('hidden', !state.customText); 
         customTextInput.required = state.customText;
-        updatePrice(); 
+        updateCartTotal();
+    });
+    
+    addToOrderBtn.addEventListener('click', () => {
+        const quantity = parseInt(document.getElementById('item-quantity').value) || 1;
+        if (!state.design || quantity <= 0) {
+            alert('Please select a design and enter a valid quantity.');
+            return;
+        }
+
+        const pricePerUnit = getUnitPrice(quantity);
+        
+        const cartItem = {
+            id: Date.now(), // Unique ID for the item
+            design: state.design,
+            quantity: quantity,
+            colors: { ...selectedColors },
+            price: pricePerUnit * quantity,
+            productName: `QuantumID - ${state.design} Design`
+        };
+        
+        cart.push(cartItem);
+        renderCart();
+        updateCartTotal();
     });
 
-    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) { fileLabel.textContent = e.target.files[0].name; } });
+    // --- CORE FUNCTIONS ---
 
-    function getUnitPrice() { if (!state.type) return 10; const priceList = pricing[state.type]; for (let tier of priceList) { if (state.quantity <= tier.max) { return tier.price; } } }
-    function updatePrice() { const unitPrice = getUnitPrice(); const customTextFee = state.customText ? 50 : 0; const total = state.baseFee + (unitPrice * state.quantity) + customTextFee; document.getElementById('basePrice').style.display = state.baseFee > 0 ? 'flex' : 'none'; document.getElementById('unitPrice').querySelector('span:last-child').textContent = `$${unitPrice}`; document.getElementById('quantityRow').querySelector('span:last-child').textContent = state.quantity; document.getElementById('customTextPrice').style.display = state.customText ? 'flex' : 'none'; document.getElementById('totalPrice').textContent = `$${total}`; }
+    function getUnitPrice(quantity) {
+        if (!state.type) return 0;
+        const priceList = pricing[state.type];
+        for (let tier of priceList) {
+            if (quantity <= tier.max) return tier.price;
+        }
+    }
+
+    function updateCartTotal() {
+        let subtotal = 0;
+        cart.forEach(item => {
+            subtotal += item.price;
+        });
+
+        const customTextFee = state.customText ? 50 : 0;
+        const baseFee = state.baseFee > 0 && cart.length > 0 ? state.baseFee : 0; // Apply base fee only if items are in cart
+        const total = baseFee + subtotal + customTextFee;
+
+        document.getElementById('basePrice').style.display = baseFee > 0 ? 'flex' : 'none';
+        document.getElementById('customTextPrice').style.display = customTextFee > 0 ? 'flex' : 'none';
+        document.getElementById('totalPrice').textContent = `$${total}`;
+    }
     
+    function renderCart() {
+        cartSummaryEl.innerHTML = ''; // Clear current cart display
+
+        if (cart.length > 0) {
+            const title = document.createElement('h3');
+            title.textContent = "Your Order";
+            title.style.marginBottom = '16px';
+            cartSummaryEl.appendChild(title);
+        }
+
+        cart.forEach((item, index) => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'cart-item';
+
+            const detailsEl = document.createElement('div');
+            detailsEl.className = 'cart-item-details';
+            detailsEl.innerHTML = `
+                <strong>${item.quantity}x ${item.productName}</strong>
+                <p>Colors: ${item.colors.top.name}, ${item.colors.middle.name}, ${item.colors.bottom.name}</p>
+            `;
+            
+            const priceEl = document.createElement('strong');
+            priceEl.textContent = `$${item.price}`;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'cart-item-remove';
+            removeBtn.textContent = 'Remove';
+            removeBtn.onclick = () => {
+                cart.splice(index, 1); // Remove item from cart array
+                renderCart();
+                updateCartTotal();
+            };
+
+            const rightSide = document.createElement('div');
+            rightSide.style.display = 'flex';
+            rightSide.style.alignItems = 'center';
+            rightSide.style.gap = '20px';
+            rightSide.appendChild(priceEl);
+            rightSide.appendChild(removeBtn);
+
+            itemEl.appendChild(detailsEl);
+            itemEl.appendChild(rightSide);
+            cartSummaryEl.appendChild(itemEl);
+        });
+    }
+    
+    function validateForm() {
+        const requiredFields = orderForm.querySelectorAll('[required]');
+        let allValid = true;
+        document.querySelectorAll('.error-message').forEach(msg => msg.classList.add('hidden'));
+
+        requiredFields.forEach(field => {
+            if (field.closest('.hidden')) return;
+            if (!field.checkValidity()) {
+                allValid = false;
+                const errorMsg = field.nextElementSibling;
+                if (errorMsg && errorMsg.classList.contains('error-message')) {
+                    errorMsg.classList.remove('hidden');
+                }
+            }
+        });
+        return allValid;
+    }
+
+    // --- DYNAMIC UI FUNCTIONS ---
+
     function setupColorControls(design) { const config = designLayers[design] || designLayers.default; colorControlsContainer.innerHTML = ''; config.layers.forEach((layerKey, index) => { const label = config.labels[index]; const control = createColorControlElement(layerKey, label); colorControlsContainer.appendChild(control); }); updateGlowDisclaimer(); }
     function createColorControlElement(layerKey, label) { const color = selectedColors[layerKey]; const controlDiv = document.createElement('div'); controlDiv.className = 'color-control'; controlDiv.innerHTML = `<div class="color-control-header" data-layer="${layerKey}"><h4>${label}</h4><div class="selected-color"><span id="${layerKey}ColorName">${color.name}</span><div class="color-preview" id="${layerKey}ColorPreview" style="background: ${color.hex};"></div></div></div><div class="color-grid" id="${layerKey}ColorGrid"></div>`; const grid = controlDiv.querySelector(`#${layerKey}ColorGrid`); colorOptions.forEach(opt => { const colorOption = createColorOptionElement(opt, layerKey); if (opt.name === color.name) { colorOption.classList.add('selected'); } grid.appendChild(colorOption); }); const header = controlDiv.querySelector('.color-control-header'); header.addEventListener('click', () => grid.classList.toggle('expanded')); return controlDiv; }
     function createColorOptionElement(color, layerKey) { const optionDiv = document.createElement('div'); optionDiv.className = 'color-option'; optionDiv.dataset.colorName = color.name; optionDiv.dataset.colorHex = color.hex; optionDiv.dataset.isGlow = color.isGlow || false; optionDiv.innerHTML = `<div class="color-swatch" style="background: ${color.hex};"></div><span class="color-name">${color.name}</span>`; optionDiv.addEventListener('click', () => selectColor(layerKey, color)); return optionDiv; }
     function selectColor(layerKey, color) { selectedColors[layerKey] = color; document.getElementById(`${layerKey}ColorName`).textContent = color.name; document.getElementById(`${layerKey}ColorPreview`).style.background = color.hex; const grid = document.getElementById(`${layerKey}ColorGrid`); grid.querySelectorAll('.color-option').forEach(opt => { opt.classList.toggle('selected', opt.dataset.colorName === color.name); }); if (viewer3D && viewer3D.materials && viewer3D.materials[layerKey]) { viewer3D.materials[layerKey].color.set(color.hex); } updateGlowDisclaimer(); grid.classList.remove('expanded'); }
     function updateGlowDisclaimer() { const hasGlow = Object.values(selectedColors).some(color => color.isGlow); document.getElementById('glowDisclaimer').classList.toggle('visible', hasGlow); }
+
+    // --- LIFECYCLE AND 3D ---
 
     document.addEventListener('DOMContentLoaded', () => { 
         const videoToggle = document.getElementById('video-toggle'); 
@@ -1022,65 +1142,55 @@
 
     // --- STRIPE CHECKOUT LOGIC ---
     const stripe = Stripe('pk_test_51Rmh2lA2ORZxLqWg8rgbL4DDcBTLRj1VrSRrntLz6A3U52IIOwKLIi8hoKChpxbpcEV2Lb9uGfpcawYQOPI8k0c7007cAC22E3'); 
-    const orderButton = document.getElementById('order-button');
-    const orderForm = document.getElementById('orderForm');
-
-    function validateForm() {
-        // Correctly select all required fields, then filter by visibility inside the loop
-        const requiredFields = orderForm.querySelectorAll('[required]');
-        let allValid = true;
-
-        // Hide all previous error messages before re-validating
-        document.querySelectorAll('.error-message').forEach(msg => msg.classList.add('hidden'));
-
-        requiredFields.forEach(field => {
-            // This is the key check: only validate fields that are not inside a hidden container
-            if (field.closest('.hidden')) {
-                return; // Skip validation for hidden fields
-            }
-
-            if (!field.checkValidity()) {
-                allValid = false;
-                // Show the error message for this specific invalid field
-                const errorMsg = field.nextElementSibling;
-                if (errorMsg && errorMsg.classList.contains('error-message')) {
-                    errorMsg.classList.remove('hidden');
-                }
-            }
-        });
-
-        return allValid;
-    }
 
     orderForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // Add class to the form to enable our CSS validation styles
         orderForm.classList.add('form-was-validated');
-
-        // Stop if validation fails
-        if (!validateForm()) {
+        
+        if (!validateForm() || cart.length === 0) {
+            if (cart.length === 0) {
+                alert('Your order is empty. Please add at least one item.');
+            }
             return;
         }
 
+        const orderButton = document.getElementById('order-button');
         orderButton.textContent = 'Processing...';
         orderButton.disabled = true;
-
-        const unitPrice = getUnitPrice();
-        const customTextFee = state.customText ? 50 : 0;
-        const baseFee = state.baseFee;
-        const quantity = state.quantity;
-        const totalInDollars = baseFee + (unitPrice * quantity) + customTextFee;
         
-        const productName = state.type === 'custom' ? 'Custom QuantumID Order' : `QuantumID - ${state.design} Design`;
-
+        // Prepare line items from the cart for Stripe
+        const line_items = cart.map(item => {
+            return {
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: item.productName,
+                    },
+                    unit_amount: Math.round(item.price / item.quantity * 100), // Price per unit in cents
+                },
+                quantity: item.quantity,
+            };
+        });
+        
+        // Add custom text fee as a separate line item if applicable
+        if (state.customText) {
+            line_items.push({
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: 'Custom Text Add-on',
+                    },
+                    unit_amount: 5000, // $50 in cents
+                },
+                quantity: 1,
+            });
+        }
+        
         const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                productName: productName,
-                quantity: 1, 
-                amount: Math.round(totalInDollars * 100)
+                line_items: line_items // Send the detailed line items
             })
         });
 
