@@ -818,8 +818,8 @@
 
             <div class="form-group">
               <label>NFC Link URL</label>
-              <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com" required>
-              <div class="error-message hidden">Please enter a valid URL.</div>
+              <input type="text" inputmode="url" pattern=".*\..+" id="nfcUrl" name="nfcUrl" placeholder="example.com" required>
+              <div class="error-message hidden">Please enter a valid domain (e.g., example.com).</div>
             </div>
 
             <div class="form-group">
@@ -1026,18 +1026,22 @@
     const orderForm = document.getElementById('orderForm');
 
     function validateForm() {
+        // Correctly select all required fields, then filter by visibility inside the loop
         const requiredFields = orderForm.querySelectorAll('[required]');
         let allValid = true;
 
+        // Hide all previous error messages before re-validating
         document.querySelectorAll('.error-message').forEach(msg => msg.classList.add('hidden'));
 
         requiredFields.forEach(field => {
+            // This is the key check: only validate fields that are not inside a hidden container
             if (field.closest('.hidden')) {
-                return; 
+                return; // Skip validation for hidden fields
             }
 
             if (!field.checkValidity()) {
                 allValid = false;
+                // Show the error message for this specific invalid field
                 const errorMsg = field.nextElementSibling;
                 if (errorMsg && errorMsg.classList.contains('error-message')) {
                     errorMsg.classList.remove('hidden');
@@ -1051,8 +1055,10 @@
     orderForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        // Add class to the form to enable our CSS validation styles
         orderForm.classList.add('form-was-validated');
 
+        // Stop if validation fails
         if (!validateForm()) {
             return;
         }
