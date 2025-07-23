@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuantumID - Premium NFC Tokens</title>
+  <title>GetQID - Premium NFC Tokens</title>
   <script src="https://js.stripe.com/v3/"></script>
   <style>
     * {
@@ -129,7 +129,7 @@
     
     .keychain-image {
         width: 300px;
-        height: 300px;
+        height: 600px;
         border-radius: 18px;
         margin: 0 auto 30px;
         object-fit: cover;
@@ -656,14 +656,14 @@
 <body>
   <header class="header">
     <div class="container">
-      <h2 style="font-size: 24px; font-weight: 600;">QuantumID</h2>
+      <h2 style="font-size: 24px; font-weight: 600;">GetQID</h2>
     </div>
   </header>
 
   <main>
     <div class="intro-section">
         <div class="container">
-            <h1>QuantumID</h1>
+            <h1>GetQID</h1>
             <h2>Tap into the Future.</h2>
             <p class="description">
                 Redefine your network with QuantumID, the digital business card that makes a lasting impression with a single tap.
@@ -682,7 +682,7 @@
                     <img src="image4.png" alt="QuantumID product example 4">
                 </div>
             </div>
-            <a href="#order-section" class="cta-button">Create Your QuantumID</a>
+            <a href="#order-section" class="cta-button">Create Your QID</a>
         </div>
     </div>
     
@@ -757,9 +757,9 @@
                   <img src="micimg.png" alt="Microphone">
                   <div>Microphone</div>
                 </div>
-                <div class="design-option" data-design="book">
-                  <img src="bookimg.png" alt="Book">
-                  <div>Book</div>
+                <div class="design-option" data-design="car">
+                  <img src="carimg.png" alt="Car">
+                  <div>Car</div>
                 </div>
                 <div class="design-option" data-design="leaf">
                   <img src="leafimg.png" alt="Leaf">
@@ -776,7 +776,7 @@
                   <input type="checkbox" id="addCustomText" name="addCustomText">
                   <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
                 </div>
-                <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden" style="margin-top: 16px;">
+                <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden">
               </div>
             </div>
 
@@ -799,12 +799,12 @@
 
             <div class="form-group">
               <label>Quantity</label>
-              <input type="number" id="quantity" name="quantity" value="1" min="1">
+              <input type="number" id="quantity" name="quantity" value="1" min="1" required>
             </div>
 
             <div class="form-group">
               <label>NFC Link URL</label>
-              <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com">
+              <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com" required>
             </div>
 
             <div class="form-group">
@@ -925,6 +925,7 @@
     const fileInput = document.getElementById('customFile');
     const fileLabel = document.querySelector('.file-upload-label span');
     const colorControlsContainer = document.getElementById('colorControls');
+    const customDescription = document.querySelector('textarea[name="customDescription"]');
 
     typeOptions.forEach(option => {
       option.addEventListener('click', () => {
@@ -935,11 +936,18 @@
         if (state.type === 'premade') {
           premadeSection.classList.remove('hidden');
           customSection.classList.add('hidden');
+          customDescription.required = false;
           if(state.design) customizerSection.classList.remove('hidden');
         } else {
           premadeSection.classList.add('hidden');
           customSection.classList.remove('hidden');
           customizerSection.classList.add('hidden');
+          customDescription.required = true;
+          state.customText = false;
+          customTextCheckbox.checked = false;
+          customTextOption.classList.remove('checked');
+          customTextInput.classList.add('hidden');
+          customTextInput.required = false;
         }
         updatePrice();
       });
@@ -957,7 +965,16 @@
     });
 
     quantityInput.addEventListener('input', (e) => { state.quantity = parseInt(e.target.value) || 1; updatePrice(); });
-    customTextOption.addEventListener('click', () => { state.customText = !state.customText; customTextCheckbox.checked = state.customText; customTextOption.classList.toggle('checked', state.customText); customTextInput.classList.toggle('hidden', !state.customText); updatePrice(); });
+    
+    customTextOption.addEventListener('click', () => { 
+        state.customText = !state.customText; 
+        customTextCheckbox.checked = state.customText; 
+        customTextOption.classList.toggle('checked', state.customText); 
+        customTextInput.classList.toggle('hidden', !state.customText); 
+        customTextInput.required = state.customText;
+        updatePrice(); 
+    });
+
     fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) { fileLabel.textContent = e.target.files[0].name; } });
 
     function getUnitPrice() { if (!state.type) return 10; const priceList = pricing[state.type]; for (let tier of priceList) { if (state.quantity <= tier.max) { return tier.price; } } }
@@ -969,14 +986,25 @@
     function selectColor(layerKey, color) { selectedColors[layerKey] = color; document.getElementById(`${layerKey}ColorName`).textContent = color.name; document.getElementById(`${layerKey}ColorPreview`).style.background = color.hex; const grid = document.getElementById(`${layerKey}ColorGrid`); grid.querySelectorAll('.color-option').forEach(opt => { opt.classList.toggle('selected', opt.dataset.colorName === color.name); }); if (viewer3D && viewer3D.materials && viewer3D.materials[layerKey]) { viewer3D.materials[layerKey].color.set(color.hex); } updateGlowDisclaimer(); grid.classList.remove('expanded'); }
     function updateGlowDisclaimer() { const hasGlow = Object.values(selectedColors).some(color => color.isGlow); document.getElementById('glowDisclaimer').classList.toggle('visible', hasGlow); }
 
-    document.addEventListener('DOMContentLoaded', () => { const videoToggle = document.getElementById('video-toggle'); const videoContainer = document.getElementById('video-container'); videoToggle.addEventListener('click', () => { const isExpanded = videoContainer.classList.toggle('expanded'); videoToggle.textContent = isExpanded ? 'Hide Video Examples ▲' : 'Show Video Examples ▼'; }); });
+    document.addEventListener('DOMContentLoaded', () => { 
+        const videoToggle = document.getElementById('video-toggle'); 
+        const videoContainer = document.getElementById('video-container'); 
+        videoToggle.addEventListener('click', () => { const isExpanded = videoContainer.classList.toggle('expanded'); videoToggle.textContent = isExpanded ? 'Hide Video Examples ▲' : 'Show Video Examples ▼'; });
+        
+        window.addEventListener('pageshow', (event) => {
+          if (event.persisted) {
+            const orderButton = document.getElementById('order-button');
+            orderButton.textContent = 'Proceed to Checkout';
+            orderButton.disabled = false;
+          }
+        });
+    });
 
     let viewer3D = null;
     function init3DViewer() { if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') { setTimeout(init3DViewer, 100); return; } const container = document.getElementById('viewer'); container.innerHTML = ''; if (viewer3D && viewer3D.renderer) { viewer3D.renderer.dispose(); } try { const scene = new THREE.Scene(); scene.background = new THREE.Color(0xf5f5f7); const group = new THREE.Group(); scene.add(group); const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000); camera.position.set(0, 0, 100); camera.lookAt(group.position); const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setSize(container.clientWidth, container.clientHeight); renderer.shadowMap.enabled = true; container.appendChild(renderer.domElement); const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.05; controls.screenSpacePanning = false; controls.minDistance = 30; controls.maxDistance = 200; controls.autoRotate = true; controls.autoRotateSpeed = 1.0; const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight); const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8); directionalLight.position.set(10, 10, 5); directionalLight.castShadow = true; scene.add(directionalLight); const currentDesignConfig = designLayers[state.design] || designLayers.default; const layersToRender = currentDesignConfig.layers; const spacing = currentDesignConfig.spacing; const materials = {}; layersToRender.forEach(layerKey => { materials[layerKey] = new THREE.MeshPhongMaterial({ color: selectedColors[layerKey].hex, specular: 0x222222, shininess: 100 }); }); const placeholderMeshes = createPlaceholders(group, materials, layersToRender, spacing); if (typeof THREE.STLLoader !== 'undefined') { const loader = new THREE.STLLoader(); const design = state.design; layersToRender.forEach((layerKey, index) => { const filename = `${design}-${layerKey}.stl`; loader.load(filename, (geometry) => { if(placeholderMeshes[index]) group.remove(placeholderMeshes[index]); geometry.computeBoundingBox(); const bbox = geometry.boundingBox; const center = new THREE.Vector3(); bbox.getCenter(center); geometry.translate(-center.x, -center.y, -center.z); const mesh = new THREE.Mesh(geometry, materials[layerKey]); const offset = (layersToRender.length - 1) / 2.0; mesh.position.z = (index - offset) * spacing; mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = layerKey; group.add(mesh); const size = new THREE.Vector3(); new THREE.Box3().setFromObject(group).getSize(size); const maxDim = Math.max(size.x, size.y, size.z); camera.position.z = maxDim * 1.8; }, undefined, () => { console.warn(`Could not load ${filename}, using placeholder`); }); }); } viewer3D = { scene, camera, renderer, materials, group }; function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); } animate(); window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); }); } catch (error) { console.error('Error initializing 3D viewer:', error); } }
     function createPlaceholders(group, materials, layers, spacing) { const meshes = []; const geometries = [ new THREE.CylinderGeometry(25, 25, 5, 32), new THREE.CylinderGeometry(23, 23, 5, 32), new THREE.CylinderGeometry(21, 21, 5, 32), new THREE.CylinderGeometry(19, 19, 5, 32) ]; const offset = (layers.length - 1) / 2.0; layers.forEach((layerKey, index) => { const mesh = new THREE.Mesh(geometries[index], materials[layerKey]); mesh.position.z = (index - offset) * spacing; mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = layerKey + '_placeholder'; group.add(mesh); meshes.push(mesh); }); return meshes; }
 
     // --- STRIPE CHECKOUT LOGIC ---
-    // PASTE YOUR STRIPE PUBLISHABLE KEY HERE
     const stripe = Stripe('pk_test_51Rmh2lA2ORZxLqWg8rgbL4DDcBTLRj1VrSRrntLz6A3U52IIOwKLIi8hoKChpxbpcEV2Lb9uGfpcawYQOPI8k0c7007cAC22E3'); 
     const orderButton = document.getElementById('order-button');
 
