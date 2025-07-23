@@ -329,7 +329,6 @@
       border-color: #0071e3;
     }
 
-    /* New validation styles */
     .form-was-validated input:invalid,
     .form-was-validated textarea:invalid {
         border-color: #d92d20;
@@ -1027,22 +1026,18 @@
     const orderForm = document.getElementById('orderForm');
 
     function validateForm() {
-        // Find all required fields that are currently visible
-        const requiredFields = orderForm.querySelectorAll('[required]:not(.hidden)');
+        const requiredFields = orderForm.querySelectorAll('[required]');
         let allValid = true;
 
-        // Hide all previous error messages
         document.querySelectorAll('.error-message').forEach(msg => msg.classList.add('hidden'));
 
         requiredFields.forEach(field => {
-            // Check if the field is inside a hidden parent container
             if (field.closest('.hidden')) {
                 return; 
             }
 
             if (!field.checkValidity()) {
                 allValid = false;
-                // Show the error message for this specific field
                 const errorMsg = field.nextElementSibling;
                 if (errorMsg && errorMsg.classList.contains('error-message')) {
                     errorMsg.classList.remove('hidden');
@@ -1056,11 +1051,10 @@
     orderForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Add class to show validation styles
         orderForm.classList.add('form-was-validated');
 
         if (!validateForm()) {
-            return; // Stop if validation fails
+            return;
         }
 
         orderButton.textContent = 'Processing...';
