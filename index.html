@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GetQID - Premium NFC Tokens</title>
+  <title>QuantumID - Premium NFC Tokens</title>
+  <meta name="description" content="QuantumID: Tap to the future. Redefine your network with the premium NFC-enabled token that makes a lasting impression.">
   <script src="https://js.stripe.com/v3/"></script>
   <style>
     * {
@@ -616,6 +617,11 @@
         padding: 8px 12px;
         font-size: 14px;
         cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .cart-item-remove:hover {
+        background: #cc0000;
     }
     
   </style>
@@ -698,15 +704,15 @@
 <body>
   <header class="header">
     <div class="container">
-      <h2 style="font-size: 24px; font-weight: 600;">GetQID</h2>
+      <h2 style="font-size: 24px; font-weight: 600;">QuantumID</h2>
     </div>
   </header>
 
   <main>
     <div class="intro-section">
         <div class="container">
-            <h1>GetQID</h1>
-            <h2>Tap into the Future.</h2>
+            <h1>QuantumID</h1>
+            <h2>Tap to the future</h2>
             <p class="description">
                 Redefine your network with QuantumID, the digital business card that makes a lasting impression with a single tap.
             </p>
@@ -724,7 +730,7 @@
                     <img src="image4.png" alt="QuantumID product example 4">
                 </div>
             </div>
-            <a href="#order-section" class="cta-button">Create Your QID</a>
+            <a href="#order-section" class="cta-button">Create Your QuantumID</a>
         </div>
     </div>
     
@@ -975,7 +981,7 @@
           targetSection = customSection;
         }
         updateCartTotal();
-        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
       });
     });
 
@@ -987,7 +993,7 @@
         setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
-        customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
       });
     });
     
@@ -997,7 +1003,7 @@
         customTextOption.classList.toggle('checked', state.customText); 
         customTextInput.classList.toggle('hidden', !state.customText); 
         customTextInput.required = state.customText;
-        updateCartTotal();
+        updateCartTotal(); 
     });
     
     addToOrderBtn.addEventListener('click', () => {
@@ -1008,17 +1014,30 @@
         }
 
         const pricePerUnit = getUnitPrice(quantity);
+        const formattedDesignName = state.design.charAt(0).toUpperCase() + state.design.slice(1);
         
-        const cartItem = {
-            id: Date.now(), // Unique ID for the item
+        const newItem = {
             design: state.design,
             quantity: quantity,
-            colors: { ...selectedColors },
-            price: pricePerUnit * quantity,
-            productName: `QuantumID - ${state.design} Design`
+            colors: JSON.parse(JSON.stringify(selectedColors)), // Deep copy colors
+            pricePerUnit: pricePerUnit,
+            productName: `QuantumID - ${formattedDesignName} Design`
         };
         
-        cart.push(cartItem);
+        // Check if an identical item already exists in the cart
+        const newItemColorString = JSON.stringify(newItem.colors);
+        const existingItem = cart.find(item => 
+            item.design === newItem.design && JSON.stringify(item.colors) === newItemColorString
+        );
+
+        if (existingItem) {
+            // Combine quantities
+            existingItem.quantity += newItem.quantity;
+        } else {
+            // Add as a new item
+            cart.push(newItem);
+        }
+        
         renderCart();
         updateCartTotal();
     });
@@ -1027,20 +1046,27 @@
 
     function getUnitPrice(quantity) {
         if (!state.type) return 0;
+        let totalQuantityInCart = quantity;
+        cart.forEach(item => {
+            totalQuantityInCart += item.quantity;
+        });
+
         const priceList = pricing[state.type];
         for (let tier of priceList) {
-            if (quantity <= tier.max) return tier.price;
+            if (totalQuantityInCart <= tier.max) return tier.price;
         }
     }
 
     function updateCartTotal() {
         let subtotal = 0;
         cart.forEach(item => {
+            const pricePerUnit = getUnitPrice(item.quantity); // Get price based on total quantity for potential discounts
+            item.price = item.quantity * pricePerUnit;
             subtotal += item.price;
         });
 
         const customTextFee = state.customText ? 50 : 0;
-        const baseFee = state.baseFee > 0 && cart.length > 0 ? state.baseFee : 0; // Apply base fee only if items are in cart
+        const baseFee = state.type === 'custom' ? 500 : 0;
         const total = baseFee + subtotal + customTextFee;
 
         document.getElementById('basePrice').style.display = baseFee > 0 ? 'flex' : 'none';
@@ -1049,7 +1075,7 @@
     }
     
     function renderCart() {
-        cartSummaryEl.innerHTML = ''; // Clear current cart display
+        cartSummaryEl.innerHTML = '';
 
         if (cart.length > 0) {
             const title = document.createElement('h3');
@@ -1064,9 +1090,11 @@
 
             const detailsEl = document.createElement('div');
             detailsEl.className = 'cart-item-details';
+            const colorConfig = designLayers[item.design] || designLayers.default;
+            let colorStrings = colorConfig.layers.map(layerKey => `${item.colors[layerKey].name}`);
             detailsEl.innerHTML = `
                 <strong>${item.quantity}x ${item.productName}</strong>
-                <p>Colors: ${item.colors.top.name}, ${item.colors.middle.name}, ${item.colors.bottom.name}</p>
+                <p>Colors: ${colorStrings.join(', ')}</p>
             `;
             
             const priceEl = document.createElement('strong');
@@ -1076,7 +1104,7 @@
             removeBtn.className = 'cart-item-remove';
             removeBtn.textContent = 'Remove';
             removeBtn.onclick = () => {
-                cart.splice(index, 1); // Remove item from cart array
+                cart.splice(index, 1);
                 renderCart();
                 updateCartTotal();
             };
@@ -1148,7 +1176,7 @@
         orderForm.classList.add('form-was-validated');
         
         if (!validateForm() || cart.length === 0) {
-            if (cart.length === 0) {
+            if (cart.length === 0 && validateForm()) { // Only alert if the rest of the form is valid
                 alert('Your order is empty. Please add at least one item.');
             }
             return;
@@ -1158,21 +1186,20 @@
         orderButton.textContent = 'Processing...';
         orderButton.disabled = true;
         
-        // Prepare line items from the cart for Stripe
         const line_items = cart.map(item => {
+            const unitPrice = getUnitPrice(item.quantity);
             return {
                 price_data: {
                     currency: 'usd',
                     product_data: {
                         name: item.productName,
                     },
-                    unit_amount: Math.round(item.price / item.quantity * 100), // Price per unit in cents
+                    unit_amount: Math.round(unitPrice * 100), // Price per unit in cents
                 },
                 quantity: item.quantity,
             };
         });
         
-        // Add custom text fee as a separate line item if applicable
         if (state.customText) {
             line_items.push({
                 price_data: {
@@ -1180,7 +1207,7 @@
                     product_data: {
                         name: 'Custom Text Add-on',
                     },
-                    unit_amount: 5000, // $50 in cents
+                    unit_amount: 5000,
                 },
                 quantity: 1,
             });
@@ -1190,7 +1217,7 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                line_items: line_items // Send the detailed line items
+                line_items: line_items
             })
         });
 
