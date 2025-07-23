@@ -329,6 +329,12 @@
       border-color: #0071e3;
     }
 
+    /* New validation styles */
+    .form-was-validated input:invalid,
+    .form-was-validated textarea:invalid {
+        border-color: #d92d20;
+    }
+
     .checkbox-group {
       display: flex;
       align-items: center;
@@ -705,7 +711,7 @@
   
     <div class="container">
       <div id="order-section" class="selection-section">
-        <form id="orderForm">
+        <form id="orderForm" novalidate>
             <div class="hero">
                 <h1>Order Your QuantumID</h1>
                 <p>Premium NFC-enabled tokens, crafted to perfection</p>
