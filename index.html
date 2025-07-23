@@ -334,6 +334,12 @@
     .form-was-validated textarea:invalid {
         border-color: #d92d20;
     }
+    
+    .error-message {
+        color: #d92d20;
+        font-size: 14px;
+        margin-top: 6px;
+    }
 
     .checkbox-group {
       display: flex;
@@ -783,6 +789,7 @@
                   <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (+$50)</label>
                 </div>
                 <input type="text" id="customText" name="customText" placeholder="@username or custom text" class="hidden">
+                <div class="error-message hidden">Please provide your custom text.</div>
               </div>
             </div>
 
@@ -790,6 +797,7 @@
               <div class="form-group">
                 <label>Describe Your Custom Design</label>
                 <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
+                <div class="error-message hidden">Please provide a description for your custom design.</div>
               </div>
 
               <div class="form-group">
@@ -806,16 +814,19 @@
             <div class="form-group">
               <label>Quantity</label>
               <input type="number" id="quantity" name="quantity" value="1" min="1" required>
+              <div class="error-message hidden">Please enter a valid quantity.</div>
             </div>
 
             <div class="form-group">
               <label>NFC Link URL</label>
               <input type="url" id="nfcUrl" name="nfcUrl" placeholder="https://example.com" required>
+              <div class="error-message hidden">Please enter a valid URL.</div>
             </div>
 
             <div class="form-group">
               <label for="emailAddress">Your Email Address</label>
               <input type="email" id="emailAddress" name="emailAddress" placeholder="you@example.com" required>
+              <div class="error-message hidden">Please enter a valid email address.</div>
             </div>
 
             <div class="customizer-section hidden" id="customizerSection">
@@ -1013,9 +1024,45 @@
     // --- STRIPE CHECKOUT LOGIC ---
     const stripe = Stripe('pk_test_51Rmh2lA2ORZxLqWg8rgbL4DDcBTLRj1VrSRrntLz6A3U52IIOwKLIi8hoKChpxbpcEV2Lb9uGfpcawYQOPI8k0c7007cAC22E3'); 
     const orderButton = document.getElementById('order-button');
+    const orderForm = document.getElementById('orderForm');
 
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+    function validateForm() {
+        // Find all required fields that are currently visible
+        const requiredFields = orderForm.querySelectorAll('[required]:not(.hidden)');
+        let allValid = true;
+
+        // Hide all previous error messages
+        document.querySelectorAll('.error-message').forEach(msg => msg.classList.add('hidden'));
+
+        requiredFields.forEach(field => {
+            // Check if the field is inside a hidden parent container
+            if (field.closest('.hidden')) {
+                return; 
+            }
+
+            if (!field.checkValidity()) {
+                allValid = false;
+                // Show the error message for this specific field
+                const errorMsg = field.nextElementSibling;
+                if (errorMsg && errorMsg.classList.contains('error-message')) {
+                    errorMsg.classList.remove('hidden');
+                }
+            }
+        });
+
+        return allValid;
+    }
+
+    orderForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Add class to show validation styles
+        orderForm.classList.add('form-was-validated');
+
+        if (!validateForm()) {
+            return; // Stop if validation fails
+        }
+
         orderButton.textContent = 'Processing...';
         orderButton.disabled = true;
 
