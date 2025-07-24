@@ -980,9 +980,10 @@
           targetSection = customSection;
         }
         updateCartTotal();
-        requestAnimationFrame(() => {
+        // Use a timeout to ensure the element is visible before scrolling
+        setTimeout(() => {
             targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
+        }, 50);
       });
     });
 
@@ -994,9 +995,10 @@
         setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
-        requestAnimationFrame(() => {
+        // Use a timeout to ensure the element is visible before scrolling
+        setTimeout(() => {
             customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        }, 50);
       });
     });
     
@@ -1046,21 +1048,21 @@
 
     function getUnitPrice(quantity) {
         if (!state.type) return 0;
-        let totalQuantityInCart = quantity;
-        cart.forEach(item => {
-            totalQuantityInCart += item.quantity;
-        });
+        let totalQuantityInCart = 0;
+        cart.forEach(item => { totalQuantityInCart += item.quantity; });
+        totalQuantityInCart += quantity; // Include the quantity being added
 
         const priceList = pricing[state.type];
         for (let tier of priceList) {
             if (totalQuantityInCart <= tier.max) return tier.price;
         }
+        return priceList[priceList.length - 1].price;
     }
 
     function updateCartTotal() {
         let subtotal = 0;
         cart.forEach(item => {
-            const pricePerUnit = getUnitPrice(item.quantity);
+            const pricePerUnit = getUnitPrice(0); // Pass 0 as we're recalculating based on existing cart total
             item.price = item.quantity * pricePerUnit;
             subtotal += item.price;
         });
@@ -1069,9 +1071,12 @@
         const baseFee = state.type === 'custom' ? 500 : 0;
         const total = baseFee + subtotal + customTextFee;
 
-        document.getElementById('basePrice') && (document.getElementById('basePrice').style.display = baseFee > 0 ? 'flex' : 'none');
+        if(document.getElementById('basePrice')) {
+          document.getElementById('basePrice').style.display = baseFee > 0 ? 'flex' : 'none';
+        }
         document.getElementById('customTextPrice').style.display = customTextFee > 0 ? 'flex' : 'none';
         document.getElementById('totalPrice').textContent = `$${total}`;
+        renderCart(); // Re-render cart to update prices if they changed
     }
     
     function renderCart() {
