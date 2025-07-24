@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuantumID - Premium NFC Tokens</title>
-  <meta name="description" content="QuantumID: Tap to the future. Redefine your network with the premium NFC-enabled token that makes a lasting impression.">
+  <title>QuantumID - Premium NFC IDs</title>
+  <meta name="description" content="QuantumID: Tap to the future. Redefine your network with the premium NFC-enabled ID that makes a lasting impression.">
   <script src="https://js.stripe.com/v3/"></script>
   <style>
     * {
@@ -304,6 +304,10 @@
 
     .form-group {
       margin-bottom: 32px;
+    }
+
+    .checkbox-group-wrapper {
+        margin-top: 40px;
     }
 
     .form-group label {
@@ -796,10 +800,10 @@
         <form id="orderForm" novalidate>
             <div class="hero">
                 <h1>Order Your QuantumID</h1>
-                <p>Premium NFC-enabled tokens, crafted to perfection</p>
+                <p>Premium NFC-enabled QuantumIDs, crafted to perfection</p>
             </div>
           
-            <h2 class="section-title">Choose Your Token Type</h2>
+            <h2 class="section-title">Choose Your QuantumID Type</h2>
             
             <div class="token-type-selector">
               <div class="type-option" data-type="premade">
@@ -809,7 +813,7 @@
               </div>
               <div class="type-option" data-type="custom">
                 <h3>Custom Design</h3>
-                <p>Create your unique token</p>
+                <p>Create your unique QuantumID</p>
                 <p style="font-size: 16px; margin-top: 8px; color: #1d1d1f;">$500 base + unit price</p>
               </div>
             </div>
@@ -860,7 +864,7 @@
               </div>
 
               <div class="customizer-section hidden" id="customizerSection">
-                <h3 style="margin-bottom: 24px;">Customize Your Token</h3>
+                <h3 style="margin-bottom: 24px;">Customize Your QuantumID</h3>
                 
                 <div id="viewer">
                   <div class="viewer-placeholder">
@@ -890,7 +894,7 @@
                 </div>
               </div>
 
-              <div class="form-group">
+              <div class="form-group checkbox-group-wrapper">
                 <div class="checkbox-group" id="customTextOption">
                   <input type="checkbox" id="addCustomText" name="addCustomText">
                   <label for="addCustomText" style="margin: 0;">Add Instagram Handle or Custom Name (for all items)</label>
@@ -1154,9 +1158,6 @@
 
             const rightSide = document.createElement('div');
             rightSide.className = 'right-side';
-            rightSide.style.display = 'flex';
-            rightSide.style.alignItems = 'center';
-            rightSide.style.gap = '20px';
             rightSide.appendChild(priceEl);
             rightSide.appendChild(removeBtn);
 
