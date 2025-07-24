@@ -228,6 +228,10 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
     }
 
+    #select-design-heading, #custom-design-label {
+        scroll-margin-top: 100px; /* Offset for sticky header */
+    }
+
     .token-type-selector {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -657,6 +661,12 @@
           grid-template-columns: 1fr 1fr;
       }
 
+      .keychain-image {
+          width: 80%;
+          max-width: 250px;
+          height: auto;
+      }
+
       .pitch-section h2 {
           font-size: 28px;
       }
@@ -696,6 +706,36 @@
       
       .order-button {
           width: 100%;
+      }
+
+      .add-to-order-group {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+      }
+
+      .add-to-order-group input {
+          width: 100% !important;
+          margin-right: 0 !important;
+          margin-bottom: 10px;
+          text-align: center;
+      }
+      
+      .add-to-order-group button {
+          width: 100% !important;
+      }
+      
+      .cart-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+      }
+
+      .cart-item .right-side {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
       }
     }
   </style>
@@ -775,7 +815,7 @@
             </div>
 
             <div id="premadeSection" class="hidden">
-              <h3 style="margin-bottom: 24px;">Select a Design</h3>
+              <h3 id="select-design-heading" style="margin-bottom: 24px;">Select a Design</h3>
               <div class="design-grid">
                 <div class="design-option" data-design="wine">
                   <img src="wineimg.png" alt="Wine Glass">
@@ -843,7 +883,7 @@
                   Colors shown are digital representations and may vary slightly from the actual printed product due to material properties and lighting conditions.
                 </p>
 
-                <div class="form-group" style="margin-top: 24px;">
+                <div class="form-group add-to-order-group" style="margin-top: 24px;">
                     <label for="item-quantity">Quantity for this Design</label>
                     <input type="number" id="item-quantity" value="1" min="1" style="width: 100px; display: inline-block; margin-right: 16px;">
                     <button type="button" id="add-to-order-btn" class="order-button" style="width: auto; display: inline-block; vertical-align: middle;">Add to Order</button>
@@ -862,7 +902,7 @@
 
             <div id="customSection" class="hidden">
               <div class="form-group">
-                <label>Describe Your Custom Design</label>
+                <label id="custom-design-label">Describe Your Custom Design</label>
                 <textarea name="customDescription" rows="4" placeholder="Please describe your custom token design in detail..."></textarea>
                 <div class="error-message hidden">Please provide a description for your custom design.</div>
               </div>
@@ -960,12 +1000,12 @@
         option.classList.add('selected');
         state.type = option.dataset.type;
         
-        let targetSection;
+        let targetElement;
         if (state.type === 'premade') {
           premadeSection.classList.remove('hidden');
           customSection.classList.add('hidden');
           customDescription.required = false;
-          targetSection = premadeSection;
+          targetElement = document.getElementById('select-design-heading');
         } else {
           state.baseFee = 500;
           premadeSection.classList.add('hidden');
@@ -977,12 +1017,11 @@
           customTextOption.classList.remove('checked');
           customTextInput.classList.add('hidden');
           customTextInput.required = false;
-          targetSection = customSection;
+          targetElement = document.getElementById('custom-design-label');
         }
         updateCartTotal();
-        // Use a timeout to ensure the element is visible before scrolling
         setTimeout(() => {
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
       });
     });
@@ -995,7 +1034,6 @@
         setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
-        // Use a timeout to ensure the element is visible before scrolling
         setTimeout(() => {
             customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 50);
@@ -1050,7 +1088,7 @@
         if (!state.type) return 0;
         let totalQuantityInCart = 0;
         cart.forEach(item => { totalQuantityInCart += item.quantity; });
-        totalQuantityInCart += quantity; // Include the quantity being added
+        totalQuantityInCart += quantity;
 
         const priceList = pricing[state.type];
         for (let tier of priceList) {
@@ -1062,7 +1100,7 @@
     function updateCartTotal() {
         let subtotal = 0;
         cart.forEach(item => {
-            const pricePerUnit = getUnitPrice(0); // Pass 0 as we're recalculating based on existing cart total
+            const pricePerUnit = getUnitPrice(0);
             item.price = item.quantity * pricePerUnit;
             subtotal += item.price;
         });
@@ -1076,7 +1114,7 @@
         }
         document.getElementById('customTextPrice').style.display = customTextFee > 0 ? 'flex' : 'none';
         document.getElementById('totalPrice').textContent = `$${total}`;
-        renderCart(); // Re-render cart to update prices if they changed
+        renderCart();
     }
     
     function renderCart() {
@@ -1115,6 +1153,7 @@
             };
 
             const rightSide = document.createElement('div');
+            rightSide.className = 'right-side';
             rightSide.style.display = 'flex';
             rightSide.style.alignItems = 'center';
             rightSide.style.gap = '20px';
