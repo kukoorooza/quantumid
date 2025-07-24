@@ -918,7 +918,6 @@
 
     let cart = []; // Shopping cart
     
-    // Layer and Color Configuration
     const designLayers = {
         default: { layers: ['bottom', 'middle', 'top'], labels: ['Bottom Layer', 'Middle Layer', 'Top Layer'], spacing: 2 },
         lips: { layers: ['bottom', 'middle', 'top', 'extra'], labels: ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4'], spacing: 1.5 }
@@ -960,7 +959,6 @@
         typeOptions.forEach(opt => opt.classList.remove('selected'));
         option.classList.add('selected');
         state.type = option.dataset.type;
-        state.baseFee = state.type === 'custom' ? 500 : 0;
         
         let targetSection;
         if (state.type === 'premade') {
@@ -969,6 +967,7 @@
           customDescription.required = false;
           targetSection = premadeSection;
         } else {
+          state.baseFee = 500;
           premadeSection.classList.add('hidden');
           customSection.classList.remove('hidden');
           customizerSection.classList.add('hidden');
@@ -981,7 +980,9 @@
           targetSection = customSection;
         }
         updateCartTotal();
-        setTimeout(() => targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        requestAnimationFrame(() => {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       });
     });
 
@@ -993,7 +994,9 @@
         setupColorControls(state.design);
         customizerSection.classList.remove('hidden');
         init3DViewer();
-        setTimeout(() => customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        requestAnimationFrame(() => {
+            customizerSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
       });
     });
     
@@ -1019,22 +1022,19 @@
         const newItem = {
             design: state.design,
             quantity: quantity,
-            colors: JSON.parse(JSON.stringify(selectedColors)), // Deep copy colors
+            colors: JSON.parse(JSON.stringify(selectedColors)),
             pricePerUnit: pricePerUnit,
             productName: `QuantumID - ${formattedDesignName} Design`
         };
         
-        // Check if an identical item already exists in the cart
         const newItemColorString = JSON.stringify(newItem.colors);
         const existingItem = cart.find(item => 
             item.design === newItem.design && JSON.stringify(item.colors) === newItemColorString
         );
 
         if (existingItem) {
-            // Combine quantities
             existingItem.quantity += newItem.quantity;
         } else {
-            // Add as a new item
             cart.push(newItem);
         }
         
@@ -1060,7 +1060,7 @@
     function updateCartTotal() {
         let subtotal = 0;
         cart.forEach(item => {
-            const pricePerUnit = getUnitPrice(item.quantity); // Get price based on total quantity for potential discounts
+            const pricePerUnit = getUnitPrice(item.quantity);
             item.price = item.quantity * pricePerUnit;
             subtotal += item.price;
         });
@@ -1069,7 +1069,7 @@
         const baseFee = state.type === 'custom' ? 500 : 0;
         const total = baseFee + subtotal + customTextFee;
 
-        document.getElementById('basePrice').style.display = baseFee > 0 ? 'flex' : 'none';
+        document.getElementById('basePrice') && (document.getElementById('basePrice').style.display = baseFee > 0 ? 'flex' : 'none');
         document.getElementById('customTextPrice').style.display = customTextFee > 0 ? 'flex' : 'none';
         document.getElementById('totalPrice').textContent = `$${total}`;
     }
@@ -1176,7 +1176,7 @@
         orderForm.classList.add('form-was-validated');
         
         if (!validateForm() || cart.length === 0) {
-            if (cart.length === 0 && validateForm()) { // Only alert if the rest of the form is valid
+            if (cart.length === 0 && validateForm()) {
                 alert('Your order is empty. Please add at least one item.');
             }
             return;
@@ -1187,14 +1187,13 @@
         orderButton.disabled = true;
         
         const line_items = cart.map(item => {
-            const unitPrice = getUnitPrice(item.quantity);
             return {
                 price_data: {
                     currency: 'usd',
                     product_data: {
                         name: item.productName,
                     },
-                    unit_amount: Math.round(unitPrice * 100), // Price per unit in cents
+                    unit_amount: Math.round(item.pricePerUnit * 100),
                 },
                 quantity: item.quantity,
             };
