@@ -9,18 +9,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Receive the array of line items directly from the frontend
-    const { line_items } = req.body;
+    const { line_items, customOrderDetails } = req.body;
 
-    if (!line_items || !Array.isArray(line_items)) {
+    if (!line_items || !customOrderDetails) {
         return res.status(400).json({ error: { message: "Invalid order data provided." } });
     }
 
-    // Create a Checkout Session, passing the line_items array directly
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      line_items: line_items, // Pass the array from the frontend
+      line_items: line_items,
+      // Attach the detailed order as a string in the metadata
+      payment_intent_data: {
+        metadata: {
+            orderDetails: JSON.stringify(customOrderDetails)
+        }
+      },
       success_url: `${req.headers.origin}/success.html`,
       cancel_url: `${req.headers.origin}/`,
     });
