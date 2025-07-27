@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     try {
       // --- Send Confirmation Email to the Customer ---
       await resend.emails.send({
-        from: 'QuantumID Sales <sales@getquid.com>',
+        from: 'QuantumID Sales <sales@getqid.com>',
         to: [customerEmail],
         subject: 'Your QuantumID Order Confirmation',
         html: `<h1>Thank You for Your Order!</h1>
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
 
       // --- Send Notification Email to Yourself ---
       await resend.emails.send({
-        from: 'Website Notifier <noreply@getquid.com>', // Using noreply for notifications is a common practice
+        from: 'Website Notifier <noreply@getqid.com>',
         to: ['2000Daniil2106@gmail.com'],
         subject: 'New Order Received!',
         html: `<h1>New Order on GetQID.com</h1>
