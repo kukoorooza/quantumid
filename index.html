@@ -1060,18 +1060,27 @@
     });
     
     addToOrderBtn.addEventListener('click', () => {
-        const quantity = parseInt(document.getElementById('item-quantity').value) || 1;
-        if (!state.design || quantity <= 0) {
+        const quantityToAdd = parseInt(document.getElementById('item-quantity').value) || 1;
+        
+        let currentTotal = 0;
+        cart.forEach(item => { currentTotal += item.quantity; });
+        
+        if (currentTotal + quantityToAdd > 500) {
+            alert(`You can only add ${500 - currentTotal} more items to your order to stay within the 500 item limit.`);
+            return;
+        }
+
+        if (!state.design || quantityToAdd <= 0) {
             alert('Please select a design and enter a valid quantity.');
             return;
         }
 
-        const pricePerUnit = getUnitPrice(quantity);
+        const pricePerUnit = getUnitPrice(quantityToAdd);
         const formattedDesignName = state.design.charAt(0).toUpperCase() + state.design.slice(1);
         
         const newItem = {
             design: state.design,
-            quantity: quantity,
+            quantity: quantityToAdd,
             colors: JSON.parse(JSON.stringify(selectedColors)),
             pricePerUnit: pricePerUnit,
             productName: `QuantumID - ${formattedDesignName} Design`
