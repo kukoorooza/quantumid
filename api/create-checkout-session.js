@@ -19,7 +19,8 @@ export default async function handler(req, res) {
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: line_items,
-      // Attach the detailed order as a string in the metadata
+      // Tell Stripe to include the line items in the webhook event
+      expand: ['line_items'], 
       payment_intent_data: {
         metadata: {
             orderDetails: JSON.stringify(customOrderDetails)
