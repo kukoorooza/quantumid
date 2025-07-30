@@ -1220,48 +1220,65 @@
         e.preventDefault();
         orderForm.classList.add('form-was-validated');
         
-        if (!validateForm() || cart.length === 0) {
-            if (cart.length === 0 && validateForm()) {
-                alert('Your order is empty. Please add at least one item.');
-            }
+        if (!validateForm()) {
             return;
         }
-
-        const orderButton = document.getElementById('order-button');
-        orderButton.textContent = 'Processing...';
-        orderButton.disabled = true;
         
-        const line_items = cart.map(item => {
-            return {
+        const orderButton = document.getElementById('order-button');
+        let line_items;
+
+        if (state.type === 'custom') {
+            const totalInDollars = state.baseFee + (state.customText ? 50 : 0);
+            line_items = [{
                 price_data: {
                     currency: 'usd',
-                    product_data: {
-                        name: item.productName,
-                    },
+                    product_data: { name: 'Custom QuantumID Order' },
+                    unit_amount: Math.round(totalInDollars * 100),
+                },
+                quantity: 1,
+            }];
+        } else {
+             if (cart.length === 0) {
+                alert('Your order is empty. Please add at least one item.');
+                return;
+            }
+            line_items = cart.map(item => ({
+                price_data: {
+                    currency: 'usd',
+                    product_data: { name: item.productName },
                     unit_amount: Math.round(item.pricePerUnit * 100),
                 },
                 quantity: item.quantity,
-            };
-        });
-        
-        if (state.customText) {
-            line_items.push({
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: 'Custom Text Add-on',
+            }));
+            if (state.customText) {
+                line_items.push({
+                    price_data: {
+                        currency: 'usd',
+                        product_data: { name: 'Custom Text Add-on' },
+                        unit_amount: 5000,
                     },
-                    unit_amount: 5000,
-                },
-                quantity: 1,
-            });
+                    quantity: 1,
+                });
+            }
         }
+
+        orderButton.textContent = 'Processing...';
+        orderButton.disabled = true;
+        
+        const customOrderDetails = {
+            cart: cart,
+            nfcUrl: document.getElementById('nfcUrl').value,
+            customText: state.customText ? document.getElementById('customText').value : 'Not included',
+            orderType: state.type,
+            customDescription: state.type === 'custom' ? customDescription.value : 'N/A'
+        };
         
         const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                line_items: line_items
+                line_items: line_items,
+                customOrderDetails: customOrderDetails
             })
         });
 
