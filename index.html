@@ -122,10 +122,17 @@
         transform: translateY(-2px);
     }
     
+    .pitch-section, .video-section {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+        padding: 60px 40px;
+        margin: 40px auto;
+        max-width: 980px;
+    }
+
     .pitch-section {
         text-align: center;
-        padding: 80px 20px;
-        margin: 40px auto;
     }
     
     .keychain-image {
@@ -147,7 +154,6 @@
     
     .video-section {
         text-align: center;
-        padding: 40px 20px 80px;
     }
     
     .video-section h2 {
@@ -183,13 +189,13 @@
     }
     
     .video-container.expanded {
-        max-height: 1000px; /* Adjust if needed for more videos */
+        max-height: 1000px;
     }
     
     .video-placeholder {
         position: relative;
         width: 100%;
-        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        padding-bottom: 56.25%;
         background: #333;
         border-radius: 12px;
         display: flex;
@@ -229,7 +235,7 @@
     }
 
     #select-design-heading, #custom-design-label {
-        scroll-margin-top: 100px; /* Offset for sticky header */
+        scroll-margin-top: 100px;
     }
 
     .token-type-selector {
