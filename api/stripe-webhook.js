@@ -5,19 +5,19 @@ import { Resend } from 'resend';
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Helper function to buffer the request stream
-async function buffer(readable) {
-  const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
-}
+// This configuration is now here to ensure the email template knows about each design's layers.
+const designLayers = {
+    default: { layers: ['bottom', 'middle', 'top'] },
+    lips: { layers: ['bottom', 'middle', 'top', 'extra'] }
+};
 
+// --- Email Template Function ---
 function generateEmailHtml(orderDetails, totalAmount) {
     const cartItemsHtml = orderDetails.cart.map(item => {
-        const colorConfig = { layers: ['bottom', 'middle', 'top', 'extra'] }; // Simplified for email
-        const colorStrings = colorConfig.layers.filter(layerKey => item.colors[layerKey]).map(layerKey => `<li>${item.colors[layerKey].name}</li>`).join('');
+        // This logic now correctly looks up the layers for each specific design
+        const colorConfig = designLayers[item.design] || designLayers.default;
+        const colorStrings = colorConfig.layers.map(layerKey => `<li>${item.colors[layerKey].name}</li>`).join('');
+        
         return `
             <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
                 <p><strong>${item.quantity}x ${item.productName}</strong></p>
@@ -60,9 +60,18 @@ function generateEmailHtml(orderDetails, totalAmount) {
 }
 
 
-export default async function handler(req, res) {
-  console.log("Webhook received.");
+// --- Main Webhook Handler ---
 
+// Helper function to buffer the request stream
+async function buffer(readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).end('Method Not Allowed');
@@ -74,30 +83,27 @@ export default async function handler(req, res) {
   let event;
 
   try {
-    console.log("Verifying Stripe signature...");
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
-    console.log("Signature verified.");
   } catch (err) {
     console.error(`Webhook signature verification failed: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === 'checkout.session.completed') {
-    console.log("Handling checkout.session.completed event.");
     const session = event.data.object;
 
-    const lineItems = session.line_items; // Get line items from the expanded session
-
+    // Retrieve the Payment Intent to access the metadata
     const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
-    const customOrderDetails = JSON.parse(paymentIntent.metadata.orderDetails);
+    const metadata = paymentIntent.metadata;
+    const customOrderDetails = JSON.parse(metadata.orderDetails);
     
     const customerEmail = session.customer_details.email;
     const totalAmount = (session.amount_total / 100).toFixed(2);
     
     const emailHtml = generateEmailHtml(customOrderDetails, totalAmount);
-    
+
     try {
-      console.log("Sending emails...");
+      // Send Confirmation Email to the Customer
       await resend.emails.send({
         from: 'QuantumID Sales <sales@getqid.com>',
         to: [customerEmail],
@@ -105,19 +111,19 @@ export default async function handler(req, res) {
         html: `<h1>Thank You for Your Order!</h1><p>We've received your order and will begin processing it shortly.</p>${emailHtml}`,
       });
 
+      // Send Notification Email to Yourself
       await resend.emails.send({
         from: 'Website Notifier <noreply@getqid.com>',
         to: ['2000Daniil2106@gmail.com'],
         subject: 'New Order Received!',
         html: `<h1>New Order on GetQID.com from ${customerEmail}</h1>${emailHtml}`,
       });
-      console.log("Emails sent successfully.");
+
     } catch (error) {
       console.error("Error sending emails:", error);
     }
   }
 
-  console.log("Responding to Stripe.");
   res.status(200).json({ received: true });
 }
 
