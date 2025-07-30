@@ -5,38 +5,88 @@ import { Resend } from 'resend';
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-function generateEmailHtml(orderDetails, totalAmount) {
-    // ... (This function remains the same as before) ...
+// Helper function to buffer the request stream
+async function buffer(readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
 }
 
+function generateEmailHtml(orderDetails, totalAmount) {
+    const cartItemsHtml = orderDetails.cart.map(item => {
+        const colorConfig = { layers: ['bottom', 'middle', 'top', 'extra'] }; // Simplified for email
+        const colorStrings = colorConfig.layers.filter(layerKey => item.colors[layerKey]).map(layerKey => `<li>${item.colors[layerKey].name}</li>`).join('');
+        return `
+            <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                <p><strong>${item.quantity}x ${item.productName}</strong></p>
+                <p style="color:#555; margin-left: 15px;">Colors:</p>
+                <ul style="color:#555; margin-left: 30px;">${colorStrings}</ul>
+            </div>
+        `;
+    }).join('');
+
+    const customTextHtml = orderDetails.customText !== 'Not included' 
+        ? `<p><strong>Custom Text Add-on:</strong> ${orderDetails.customText}</p>` 
+        : '';
+
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
+                .header { text-align: center; margin-bottom: 20px; }
+                .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #999; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header"><h1>QuantumID Order Summary</h1></div>
+                <h3>Order Details:</h3>
+                ${cartItemsHtml}
+                <h3>Additional Info:</h3>
+                <p><strong>NFC Link URL:</strong> ${orderDetails.nfcUrl}</p>
+                ${customTextHtml}
+                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="text-align: right; font-size: 18px;"><strong>Total: $${totalAmount}</strong></p>
+                <div class="footer"><p>&copy; ${new Date().getFullYear()} QuantumID</p></div>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
+
 export default async function handler(req, res) {
-  console.log("Webhook received."); // Log #1
+  console.log("Webhook received.");
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).end('Method Not Allowed');
   }
 
-  const buf = await new Promise((resolve, reject) => { /* ... (body parsing logic) ... */ });
+  const buf = await buffer(req);
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event;
 
   try {
-    console.log("Verifying Stripe signature..."); // Log #2
+    console.log("Verifying Stripe signature...");
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
-    console.log("Signature verified."); // Log #3
+    console.log("Signature verified.");
   } catch (err) {
     console.error(`Webhook signature verification failed: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === 'checkout.session.completed') {
-    console.log("Handling checkout.session.completed event."); // Log #4
+    console.log("Handling checkout.session.completed event.");
     const session = event.data.object;
 
-    // The line items are now included directly in the session object
-    const lineItems = session.line_items;
+    const lineItems = session.line_items; // Get line items from the expanded session
 
     const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
     const customOrderDetails = JSON.parse(paymentIntent.metadata.orderDetails);
@@ -47,17 +97,32 @@ export default async function handler(req, res) {
     const emailHtml = generateEmailHtml(customOrderDetails, totalAmount);
     
     try {
-      console.log("Sending emails..."); // Log #5
-      await resend.emails.send({ /* ... (customer email) ... */ });
-      await resend.emails.send({ /* ... (owner email) ... */ });
-      console.log("Emails sent successfully.");// Log #6
+      console.log("Sending emails...");
+      await resend.emails.send({
+        from: 'QuantumID Sales <sales@getqid.com>',
+        to: [customerEmail],
+        subject: 'Your QuantumID Order Confirmation',
+        html: `<h1>Thank You for Your Order!</h1><p>We've received your order and will begin processing it shortly.</p>${emailHtml}`,
+      });
+
+      await resend.emails.send({
+        from: 'Website Notifier <noreply@getqid.com>',
+        to: ['2000Daniil2106@gmail.com'],
+        subject: 'New Order Received!',
+        html: `<h1>New Order on GetQID.com from ${customerEmail}</h1>${emailHtml}`,
+      });
+      console.log("Emails sent successfully.");
     } catch (error) {
       console.error("Error sending emails:", error);
     }
   }
 
-  console.log("Responding to Stripe."); // Log #7
+  console.log("Responding to Stripe.");
   res.status(200).json({ received: true });
 }
 
-export const config = { api: { bodyParser: false } };
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
